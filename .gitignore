@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# Other editors
+*~
+.idea/
+.save
+
+# Logs
+nohup.out
