@@ -4,8 +4,8 @@
 
 
 """
-This script updates list of tags that appeared at least once in the
-master notebook with all snippets.
+This script updates list of tags that appear at least once in the
+most recent version of the master notebook with all snippets.
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
@@ -44,7 +44,7 @@ def parse_tags() -> List[str]:
 
 def write_tags(list_of_tags: List[str]) -> type(None):
     """
-    Override previous content of the file with tags from the list.
+    Overwrite previous content of the file with tags from the list.
     """
     relative_path = '../../list_of_tags.txt'
     absolute_path = convert_to_absolute_path(relative_path)
