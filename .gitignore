@@ -107,3 +107,6 @@ ENV/
 
 # Logs
 nohup.out
+
+# Output
+snippets_that_match_query.ipynb
