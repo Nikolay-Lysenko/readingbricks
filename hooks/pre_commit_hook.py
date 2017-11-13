@@ -15,7 +15,6 @@ is placed and named correctly.
 
 import os
 import subprocess
-import shlex
 import json
 from typing import List
 
@@ -58,8 +57,8 @@ def add_file_with_tags_to_commit() -> type(None):
     Add file with tags to the next commit (then post-commit hook
     will commit it and transfer to the current commit before push).
     """
-     # `git add ..` can not be run from `.git/*`,
-     # because this directory is outside of work tree.
+    # `git add ..` can not be run from `.git/*`,
+    # because this directory is outside of work tree.
     relative_path = '../../'
     absolute_path = convert_to_absolute_path(relative_path)
     path_to_add = 'list_of_tags.txt'
