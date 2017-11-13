@@ -43,7 +43,7 @@ def parse_cli_args() -> argparse.Namespace:
     """
     Parse arguments passed via Command Line Interface (CLI).
 
-    return:
+    :return:
         namespace with arguments
     """
     parser = argparse.ArgumentParser(description='Searching for snippets')
