@@ -48,7 +48,7 @@ def write_tags(list_of_tags: List[str]) -> type(None):
     relative_path = '../../list_of_tags.txt'
     absolute_path = convert_to_absolute_path(relative_path)
     with open(absolute_path, 'w') as out_file:
-        for tag in list_of_tags:
+        for tag in sorted(list_of_tags):
             out_file.write(tag + '\n')
 
 
