@@ -10,10 +10,10 @@ Two key parts of the repository are as follows:
 
 Currently, there is a small number of snippets and so there is no need in complicated search system. However, an outline of its evolution is created. Planned features of the search system are as follows:
 - [x] Search by tags
-- [] Logical operators
-- [] Support of tags hierarchy
-- [] Full-text search
-- [] Ranking based on flexible parameters
+- [ ] Logical operators
+- [ ] Support of tags hierarchy
+- [ ] Full-text search
+- [ ] Ranking based on flexible parameters
 
 ## How to use it?
 
