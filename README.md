@@ -19,7 +19,7 @@ Currently, there are a small number of snippets and so there is no need in compl
 
 As always, this repository can be cloned to your local machine. Just run `git clone https://github.com/Nikolay-Lysenko/snip_and_ship` from your terminal.
 
-When repository is cloned, find interesting tags in the file named `list_of_tags.txt`. Suppose that they are 'tag1', 'tag2', and 'tag3'. To make a notebook with snippets that are associated with at least one of these tags, run:
+When repository is cloned, look through the file named `list_of_tags.txt` and choose the tags you are interested in. Suppose that they are 'tag1', 'tag2', and 'tag3'. To make a notebook with snippets that are associated with at least one of these tags, run:
 
 ```
 python search.py -t tag1 tag2 tag3
