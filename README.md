@@ -8,7 +8,7 @@ Two key parts of the repository are as follows:
 * Snippets itself,
 * Search system.
 
-Currently, there is a small number of snippets and so there is no need in complicated search system. However, an outline of its evolution is created. Planned features of the search system are as follows:
+Currently, there are a small number of snippets and so there is no need in complicated search system. However, an outline of its evolution is created. Planned features of the search system are as follows:
 - [x] Search by tags
 - [ ] Logical operators
 - [ ] Support of tags hierarchy
