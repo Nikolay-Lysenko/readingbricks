@@ -1,5 +1,5 @@
 """
-This script makes a notebook with snippets that are tagged
+This script makes a notebook with notes that must be selected
 according to user query.
 
 @author: Nikolay Lysenko
@@ -20,10 +20,10 @@ def parse_cli_args() -> argparse.Namespace:
     :return:
         namespace with arguments
     """
-    parser = argparse.ArgumentParser(description='Searching for snippets')
+    parser = argparse.ArgumentParser(description='Searching for notes')
     parser.add_argument(
         '-t', '--tags', type=str, nargs='+', default='',
-        help='tags such that snippets marked with at least one of them '
+        help='tags such that notes marked with at least one of them '
              'will be included'
     )
     cli_args = parser.parse_args()
@@ -48,20 +48,20 @@ def validate_and_preprocess_cli_args(
             valid_tags.append(line.rstrip('\n'))
     for tag in cli_args.tags:
         if tag not in valid_tags:
-            warn('There are no snippets for {}'.format(tag), RuntimeWarning)
+            warn('There are no notes for {}'.format(tag), RuntimeWarning)
     return cli_args
 
 
 def compose_notebook(set_of_tags: Set[str]) -> type(None):
     """
-    Create notebook with relevant snippets only.
+    Create notebook with relevant notes only.
 
     :param set_of_tags:
         tags of cells that must be included
     :return:
         None
     """
-    relative_path = 'snippets/all_snippets_without_sorting.ipynb'
+    relative_path = 'notes/all_notes_without_sorting.ipynb'
     script_directory = os.path.dirname(__file__)
     absolute_path = os.path.join(script_directory, relative_path)
     all_content = json.load(open(absolute_path))
@@ -74,7 +74,7 @@ def compose_notebook(set_of_tags: Set[str]) -> type(None):
     content['cells'] = relevant_cells
     json.dump(
         content,
-        open('snippets/snippets_that_match_query.ipynb', 'w'),
+        open('notes/notes_for_the_last_query.ipynb', 'w'),
         ensure_ascii=False
     )
 

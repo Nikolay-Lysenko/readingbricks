@@ -109,4 +109,4 @@ ENV/
 nohup.out
 
 # Output
-snippets_that_match_query.ipynb
+notes_for_the_last_query.ipynb

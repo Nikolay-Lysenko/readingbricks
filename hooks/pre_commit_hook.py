@@ -5,7 +5,7 @@
 
 """
 This script updates list of tags that appear at least once in the
-most recent version of the master notebook with all snippets.
+most recent version of the master notebook with all notes.
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
@@ -32,7 +32,7 @@ def parse_tags() -> List[str]:
     """
     Parse JSON file with notebooks and extract all unique tags.
     """
-    relative_path = '../../snippets/all_snippets_without_sorting.ipynb'
+    relative_path = '../../notes/all_notes_without_sorting.ipynb'
     absolute_path = convert_to_absolute_path(relative_path)
     cells = json.load(open(absolute_path))['cells']
     tags = set()
