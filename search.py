@@ -10,6 +10,46 @@ import os
 import json
 import argparse
 from typing import Set
+from warnings import warn
+
+
+def parse_cli_args() -> argparse.Namespace:
+    """
+    Parse arguments passed via Command Line Interface (CLI).
+
+    :return:
+        namespace with arguments
+    """
+    parser = argparse.ArgumentParser(description='Searching for snippets')
+    parser.add_argument(
+        '-t', '--tags', type=str, nargs='+', default='',
+        help='tags such that snippets marked with at least one of them '
+             'will be included'
+    )
+    cli_args = parser.parse_args()
+    return cli_args
+
+
+def validate_and_preprocess_cli_args(
+        cli_args: argparse.Namespace
+        ) -> argparse.Namespace:
+    """
+    Inform user about potential mistakes and preprocess input.
+
+    :param cli_args:
+        namespace with arguments
+    :return:
+        namespace with validated arguments
+    """
+    cli_args.tags = set(cli_args.tags)
+    valid_tags = []
+    with open('list_of_tags.txt') as tags_file:
+        for line in tags_file:
+            valid_tags.append(line.rstrip('\n'))
+    for tag in cli_args.tags:
+        if tag not in valid_tags:
+            warn('There are no snippets for {}'.format(tag), RuntimeWarning)
+    return cli_args
 
 
 def compose_notebook(set_of_tags: Set[str]) -> type(None):
@@ -39,26 +79,10 @@ def compose_notebook(set_of_tags: Set[str]) -> type(None):
     )
 
 
-def parse_cli_args() -> argparse.Namespace:
-    """
-    Parse arguments passed via Command Line Interface (CLI).
-
-    :return:
-        namespace with arguments
-    """
-    parser = argparse.ArgumentParser(description='Searching for snippets')
-    parser.add_argument(
-        '-t', '--tags', type=str, nargs='+', default='',
-        help='tags such that snippets marked with at least one of them '
-             'will be included'
-    )
-    cli_args = parser.parse_args()
-    return cli_args
-
-
 def main():
     cli_args = parse_cli_args()
-    compose_notebook(set(cli_args.tags))
+    cli_args = validate_and_preprocess_cli_args(cli_args)
+    compose_notebook(cli_args.tags)
 
 
 if __name__ == '__main__':
