@@ -9,8 +9,8 @@ Two key parts of the repository are as follows:
 * Search system.
 
 Currently, there are a small number of notes and so there is no need in complicated search system. However, an outline of its evolution is created. Planned features of the search system are as follows:
-- [x] Search by tags
-- [ ] Logical operators
+- [x] Search by single tag
+- [x] Logical operators
 - [ ] Support of tags hierarchy
 - [ ] Full-text search
 - [ ] Ranking based on flexible parameters
@@ -22,10 +22,16 @@ As always, this repository can be cloned to your local machine. Just run `git cl
 When repository is cloned, open the file named `counts_of_tags.tsv`. It contains tags and their frequencies in tab-separated format. Look through the file and choose the tags you are interested in. Suppose that they are 'tag1', 'tag2', and 'tag3'. To make a notebook with notes that are associated with at least one of these tags, run:
 
 ```
-python search.py -t tag1 tag2 tag3
+python search.py -e tag1 OR tag2 OR tag3
 ```
 
-Go to `notes` directory and look at the freshly created file named `notes_for_the_last_query.ipynb`. Enjoy reading!
+More complex filtering is supported too. You can write arbitrary logical expressions with AND and OR operators and parentheses:
+```
+python search.py -e \(tag1 OR tag2\) AND \(tag3 OR tag4\)
+```
+Do not forget to escape parentheses, because without escaping `bash` fails.
+
+After your query is run, go to `notes` directory and look at the freshly created file named `notes_for_the_last_query.ipynb`. Enjoy reading!
 
 ## How to contribute?
 
