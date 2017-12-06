@@ -5,7 +5,7 @@
 
 """
 This script adds to the current commit a refreshed version of
-the list of tags.
+file with tag statistics.
 The script is called after every commit automatically if its copy
 is placed and named correctly.
 

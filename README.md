@@ -19,7 +19,7 @@ Currently, there are a small number of notes and so there is no need in complica
 
 As always, this repository can be cloned to your local machine. Just run `git clone https://github.com/Nikolay-Lysenko/snip_and_ship` from your terminal.
 
-When repository is cloned, look through the file named `list_of_tags.txt` and choose the tags you are interested in. Suppose that they are 'tag1', 'tag2', and 'tag3'. To make a notebook with notes that are associated with at least one of these tags, run:
+When repository is cloned, open the file named `counts_of_tags.tsv`. It contains tags and their frequencies in tab-separated format. Look through the file and choose the tags you are interested in. Suppose that they are 'tag1', 'tag2', and 'tag3'. To make a notebook with notes that are associated with at least one of these tags, run:
 
 ```
 python search.py -t tag1 tag2 tag3
@@ -31,6 +31,6 @@ Go to `notes` directory and look at the freshly created file named `notes_for_th
 
 Everyone can create a pull request.
 
-Note that it is strongly recommended to update list of tags automatically. This is easy — just copy and rename files from `hooks` directory according to instructions that are placed inside of them right below shebang. If it is done correctly, Git hooks will refresh list of tags for you.
+Note that it is strongly recommended to update counts of tags automatically. This is easy — just copy and rename files from `hooks` directory according to instructions that are placed inside of them right below shebang. If it is done correctly, Git hooks will refresh tag statistics for you.
 
 

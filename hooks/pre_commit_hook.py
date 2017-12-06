@@ -4,8 +4,9 @@
 
 
 """
-This script updates list of tags that appear at least once in the
-most recent version of the master notebook with all notes.
+This script updates a file with counts of tags that appear
+at least once in the most recent version of the master notebook
+with all notes.
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
@@ -16,7 +17,7 @@ is placed and named correctly.
 import os
 import subprocess
 import json
-from typing import List
+from collections import Counter
 
 
 def convert_to_absolute_path(relative_path: str) -> str:
@@ -28,40 +29,48 @@ def convert_to_absolute_path(relative_path: str) -> str:
     return absolute_path
 
 
-def parse_tags() -> List[str]:
+def count_tags() -> Counter:
     """
-    Parse JSON file with notebooks and extract all unique tags.
+    Parse JSON file of the master notebook and extract frequencies
+    of tags.
     """
     relative_path = '../../notes/all_notes_without_sorting.ipynb'
     absolute_path = convert_to_absolute_path(relative_path)
     cells = json.load(open(absolute_path))['cells']
-    tags = set()
+    tags = []
     for cell in cells:
-        tags.update(set(cell['metadata']['tags']))
-    return list(tags)
+        tags.extend(cell['metadata']['tags'])
+    return Counter(tags)
 
 
-def write_tags(list_of_tags: List[str]) -> type(None):
+def write_tag_counts(counter_of_tags: Counter) -> type(None):
     """
-    Overwrite previous content of the file with tags from the list.
+    Overwrite previous content of the file containing statistics,
+    replace old content with data that are based on `counter_of_tags`.
     """
-    relative_path = '../../list_of_tags.txt'
+    relative_path = '../../counts_of_tags.tsv'
     absolute_path = convert_to_absolute_path(relative_path)
+    tags_and_counts = counter_of_tags.most_common()
+    sorted_tags_and_counts = sorted(
+        tags_and_counts,
+        key=lambda tag_and_count: (-tag_and_count[1], tag_and_count[0])
+    )
     with open(absolute_path, 'w') as out_file:
-        for tag in sorted(list_of_tags):
-            out_file.write(tag + '\n')
+        for tag, count in sorted_tags_and_counts:
+            out_file.write(f'{tag}\t{count}\n')
 
 
-def add_file_with_tags_to_commit() -> type(None):
+def add_file_with_counts_to_commit() -> type(None):
     """
-    Add file with tags to the next commit (then post-commit hook
-    will commit it and transfer to the current commit before push).
+    Add file with tag statistics to the next commit (then
+    post-commit hook will commit it and transfer to the
+    current commit before push).
     """
     # `git add ..` can not be run from `.git/*`,
     # because this directory is outside of work tree.
     relative_path = '../../'
     absolute_path = convert_to_absolute_path(relative_path)
-    path_to_add = 'list_of_tags.txt'
+    path_to_add = 'counts_of_tags.tsv'
     subprocess.run(
         'git add {}'.format(path_to_add),
         cwd=absolute_path,  # Run above command from top level of the repo.
@@ -70,9 +79,9 @@ def add_file_with_tags_to_commit() -> type(None):
 
 
 def main():
-    list_of_tags = parse_tags()
-    write_tags(list_of_tags)
-    add_file_with_tags_to_commit()
+    counter_of_tags = count_tags()
+    write_tag_counts(counter_of_tags)
+    add_file_with_counts_to_commit()
 
 
 if __name__ == '__main__':

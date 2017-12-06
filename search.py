@@ -43,9 +43,9 @@ def validate_and_preprocess_cli_args(
     """
     cli_args.tags = set(cli_args.tags)
     valid_tags = []
-    with open('list_of_tags.txt') as tags_file:
+    with open('counts_of_tags.tsv') as tags_file:
         for line in tags_file:
-            valid_tags.append(line.rstrip('\n'))
+            valid_tags.append(line.split('\t')[0])
     for tag in cli_args.tags:
         if tag not in valid_tags:
             warn('There are no notes for {}'.format(tag), RuntimeWarning)
