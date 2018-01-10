@@ -1,0 +1,12 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ note_name }}</title>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML"></script>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/baseline_style.css') }}">
+  </head>
+
+  <body>
+    {{ preprocessed_content }}
+  </body>
+</html>
