@@ -4,8 +4,8 @@
 
 
 """
-This script adds to the current commit a refreshed version of
-file with tag statistics.
+This script adds to the current commit refreshed versions of
+automatically managed files.
 The script is called after every commit automatically if its copy
 is placed and named correctly.
 
@@ -18,8 +18,8 @@ import subprocess
 
 
 def main():
-    # Pre-commit hook has added file to the next commit.
-    # Add it to the current one.
+    # Pre-commit hook has added files to the next commit.
+    # Add them to the current one.
 
     # Break infinite recursion with disabling post-commit hooks.
     subprocess.run(

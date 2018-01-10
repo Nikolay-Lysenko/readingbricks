@@ -4,9 +4,13 @@
 
 
 """
-This script updates a file with counts of tags that appear
-at least once in the most recent version of the master notebook
-with all notes.
+This script runs all jobs that are needed for update of both
+offline and online versions of the project. The list of these jobs is
+as follows:
+1) Update a file with counts of tags that appear at least once
+   in the most recent editions of notes;
+2) Extract cells content from Jupyter notebooks and place it to
+   Markdown files available to web application.
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
@@ -18,6 +22,7 @@ import os
 import subprocess
 import json
 from collections import Counter
+from typing import List, Dict, Any, Generator
 
 
 def convert_to_absolute_path(relative_path: str) -> str:
@@ -29,27 +34,65 @@ def convert_to_absolute_path(relative_path: str) -> str:
     return absolute_path
 
 
-def count_tags() -> Counter:
+def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     """
-    Parse JSON file of the master notebook and extract frequencies
-    of tags.
+    Walk through the specified directory and yield cells of
+    Jupyter notebooks from there.
     """
-    relative_path = '../../notes/all_notes_without_sorting.ipynb'
-    absolute_path = convert_to_absolute_path(relative_path)
-    cells = json.load(open(absolute_path))['cells']
-    tags = []
-    for cell in cells:
-        tags.extend(cell['metadata']['tags'])
-    return Counter(tags)
+    file_names = [x for x in os.listdir(path_to_dir)
+                  if os.path.isfile(path_to_dir + x)]
+    for file_name in file_names:
+        with open(path_to_dir + file_name) as source_file:
+            cells = json.load(source_file)['cells']
+            for cell in cells:
+                yield cell
 
 
-def write_tag_counts(counter_of_tags: Counter) -> type(None):
+def update_list_of_tags(tags: List[str], cell: Dict[str, Any]) -> List[str]:
     """
-    Overwrite previous content of the file containing statistics,
-    replace old content with data that are based on `counter_of_tags`.
+    Update list of tags occurrences based on a current cell.
     """
-    relative_path = '../../counts_of_tags.tsv'
-    absolute_path = convert_to_absolute_path(relative_path)
+    tags.extend(cell['metadata']['tags'])
+    return tags
+
+
+def insert_blank_line_before_each_list(content: List[str]) -> List[str]:
+    """
+    Insert blank line before each Markdown list when it is needed
+    for Misaka parser.
+    """
+    list_markers = ['* ', '- ', '+ ']
+    result = []
+    for first, second in zip(content, content[1:]):
+        result.append(first)
+        if any([second.startswith(x) for x in list_markers]) and first:
+            result.append('')
+    result.append(content[-1])
+    return result
+
+
+def copy_cell_content_to_markdown_file(
+        cell: Dict[str, Any], destination_dir_path: str
+        ) -> type(None):
+    """
+    Extract content of cell and save it as Markdown file in the
+    special directory.
+    """
+    content = [line.rstrip('\n') for line in cell['source']]
+    content = insert_blank_line_before_each_list(content)
+    destination_name = content[0].lstrip('## ')
+    destination_path = destination_dir_path + destination_name + '.md'
+    with open(destination_path, 'w') as destination_file:
+        for line in content:
+            destination_file.write(line + '\n')
+
+
+def write_tag_counts(tags: List[str], absolute_path: str) -> type(None):
+    """
+    Overwrite previous content of the file where statistics are stored.
+    Namely, replace old content with data that are based on `tags`.
+    """
+    counter_of_tags = Counter(tags)
     tags_and_counts = counter_of_tags.most_common()
     sorted_tags_and_counts = sorted(
         tags_and_counts,
@@ -60,28 +103,39 @@ def write_tag_counts(counter_of_tags: Counter) -> type(None):
             out_file.write(f'{tag}\t{count}\n')
 
 
-def add_file_with_counts_to_commit() -> type(None):
+def add_to_commit(path_from_git_root: str) -> type(None):
     """
-    Add file with tag statistics to the next commit (then
-    post-commit hook will commit it and transfer to the
-    current commit before push).
+    Add file or directory to the next commit (then post-commit hook
+    will commit it and transfer to the current commit before push).
     """
     # `git add ..` can not be run from `.git/*`,
     # because this directory is outside of work tree.
-    relative_path = '../../'
-    absolute_path = convert_to_absolute_path(relative_path)
-    path_to_add = 'counts_of_tags.tsv'
+    cwd_relative_path = '../../'
+    cwd_absolute_path = convert_to_absolute_path(cwd_relative_path)
     subprocess.run(
-        'git add {}'.format(path_to_add),
-        cwd=absolute_path,  # Run above command from top level of the repo.
+        'git add {}'.format(path_from_git_root),
+        cwd=cwd_absolute_path,  # Run above command from top level of the repo.
         shell=True
     )
 
 
 def main():
-    counter_of_tags = count_tags()
-    write_tag_counts(counter_of_tags)
-    add_file_with_counts_to_commit()
+    relative_paths = {
+        'source': '../../notes/',
+        'destination': '../../readingbricks/markdown_notes/',
+        'counts':  '../../counts_of_tags.tsv'
+    }
+    absolute_paths = {
+        k: convert_to_absolute_path(v) for k, v in relative_paths.items()
+    }
+    tags = []
+    for cell in extract_cells(absolute_paths['source']):
+        tags = update_list_of_tags(tags, cell)
+        copy_cell_content_to_markdown_file(cell, absolute_paths['destination'])
+    write_tag_counts(tags, absolute_paths['counts'])
+    for path in [v.lstrip('../../')
+                 for k, v in relative_paths.items() if k != 'source']:
+        add_to_commit(path)
 
 
 if __name__ == '__main__':
