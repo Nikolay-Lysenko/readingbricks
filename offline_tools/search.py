@@ -6,12 +6,16 @@ according to user query.
 """
 
 
+import sys
 import os
 import json
 import argparse
 from typing import Set, Tuple
 from warnings import warn
 from copy import copy
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '../hooks'))
+from pre_commit_hook import extract_cells, convert_to_absolute_path
 
 
 def parse_cli_args() -> argparse.Namespace:
@@ -102,22 +106,23 @@ def compose_notebook(template: str) -> type(None):
     :return:
         None
     """
-    relative_path = 'notes/all_notes_without_sorting.ipynb'
-    script_directory = os.path.dirname(__file__)
-    absolute_path = os.path.join(script_directory, relative_path)
-    all_content = json.load(open(absolute_path))
-    all_cells = all_content['cells']
+    relative_path = '../notes/'
+    absolute_path = convert_to_absolute_path(relative_path)
     relevant_cells = []
-    for cell in all_cells:
+    for cell in extract_cells(absolute_path):
         if eval(template.format(str(cell['metadata']['tags']))):
             relevant_cells.append(cell)
+
+    file_names = [x for x in os.listdir(absolute_path)
+                  if os.path.isfile(absolute_path + x)]
+    arbitrary_file_name = file_names[0]
+    with open(absolute_path + arbitrary_file_name) as source_file:
+        all_content = json.load(source_file)
+
     content = {k: v for k, v in all_content.items() if k != 'cells'}
     content['cells'] = relevant_cells
-    json.dump(
-        content,
-        open('notes/notes_for_the_last_query.ipynb', 'w'),
-        ensure_ascii=False
-    )
+    with open('notes_for_the_last_query.ipynb', 'w') as destination_file:
+        json.dump(content, destination_file, ensure_ascii=False)
 
 
 def main():
