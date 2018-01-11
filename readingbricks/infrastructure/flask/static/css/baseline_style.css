@@ -1,5 +1,18 @@
-<style>
 body {
     background-color: #fbf1f9;
 }
-</style>
+div {
+    margin: auto;
+    width: 70%;
+    max-width: 1000px;
+}
+h1, h2 {
+    text-align: center;
+    margin-top: 5%;
+}
+p {
+    text-align: justify;
+}
+p + ul {
+    margin-top: -10px;
+}
