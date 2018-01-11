@@ -82,7 +82,7 @@ def copy_cell_content_to_markdown_file(
     """
     content = [line.rstrip('\n') for line in cell['source']]
     content = insert_blank_line_before_each_list(content)
-    msg = f"Cell header must be h2 (i.e. start with ##), found: {cell_header}"
+    msg = f"Cell header must be h2 (i.e. start with ##), found: {content[0]}"
     assert content[0].startswith('## '), msg
     destination_name = content[0].lstrip('## ')
     destination_path = destination_dir_path + destination_name + '.md'
