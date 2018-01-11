@@ -14,8 +14,10 @@ from typing import Set, Tuple
 from warnings import warn
 from copy import copy
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../hooks'))
-from pre_commit_hook import extract_cells, convert_to_absolute_path
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), '../../supplementary/hooks')
+)
+from pre_commit_hook import extract_cells
 
 
 def parse_cli_args() -> argparse.Namespace:
@@ -85,7 +87,9 @@ def validate_and_preprocess_cli_args(
         namespace with preprocessed arguments
     """
     valid_tags = []
-    with open('counts_of_tags.tsv') as tags_file:
+    relative_path = '../../supplementary/counts_of_tags.tsv'
+    absolute_path = os.path.join(os.path.dirname(__file__), relative_path)
+    with open(absolute_path) as tags_file:
         for line in tags_file:
             valid_tags.append(line.split('\t')[0])
     template, tags = parse_expression(cli_args.expression)
@@ -106,8 +110,8 @@ def compose_notebook(template: str) -> type(None):
     :return:
         None
     """
-    relative_path = '../notes/'
-    absolute_path = convert_to_absolute_path(relative_path)
+    relative_path = '../../notes/'
+    absolute_path = os.path.join(os.path.dirname(__file__), relative_path)
     relevant_cells = []
     for cell in extract_cells(absolute_path):
         if eval(template.format(str(cell['metadata']['tags']))):

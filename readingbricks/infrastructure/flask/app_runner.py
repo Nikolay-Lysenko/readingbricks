@@ -17,10 +17,11 @@ markdown_preprocessor.init_app(app)
 
 @app.route('/notes/<note_name>')
 def page_with_note(note_name):
-    requested_path = f'markdown_notes/{note_name}.md'
-    if not os.path.isfile(requested_path):
-        return page_not_found(requested_path)
-    with open(requested_path, 'r') as source_file:
+    rel_requested_path = f'markdown_notes/{note_name}.md'
+    abs_requested_path = os.path.dirname(__file__) + '/' + rel_requested_path
+    if not os.path.isfile(abs_requested_path):
+        return page_not_found(note_name)
+    with open(abs_requested_path, 'r') as source_file:
         content_in_markdown = ''.join(source_file.read())
     preprocessed_content = markdown_preprocessor.render(
         content_in_markdown,

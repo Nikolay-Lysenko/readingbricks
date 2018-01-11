@@ -1,16 +1,18 @@
 #!/usr/bin/env python
-# Be sure that a copy of this file is placed to `../.git/hooks` directory
-# under name `pre-commit` (without extension).
+# Be sure that a copy of this file is placed to `../../../.git/hooks`
+# directory under name `pre-commit` (without extension).
 
 
 """
-This script runs all jobs that are needed for update of both
-offline and online versions of the project. The list of these jobs is
-as follows:
+This script does tasks that are needed for update of both Flask
+and Jupyter interfaces of the project. Generally speaking, not all
+tasks should be done here, because it is desired to have no
+dependencies other than built-in Python packages in Git hooks.
+The list of covered tasks is as follows:
 1) Update a file with counts of tags that appear at least once
    in the most recent editions of notes;
 2) Extract cells content from Jupyter notebooks and place it to
-   Markdown files available to web application.
+   Markdown files available to Flask application.
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
@@ -22,7 +24,7 @@ import os
 import subprocess
 import json
 from collections import Counter
-from typing import List, Dict, Any, Generator
+from typing import List, Dict, Generator, Any
 
 
 def convert_to_absolute_path(relative_path: str) -> str:
@@ -80,6 +82,8 @@ def copy_cell_content_to_markdown_file(
     """
     content = [line.rstrip('\n') for line in cell['source']]
     content = insert_blank_line_before_each_list(content)
+    msg = f"Cell header must be h2 (i.e. start with ##), found: {cell_header}"
+    assert content[0].startswith('## '), msg
     destination_name = content[0].lstrip('## ')
     destination_path = destination_dir_path + destination_name + '.md'
     with open(destination_path, 'w') as destination_file:
@@ -121,9 +125,12 @@ def add_to_commit(path_from_git_root: str) -> type(None):
 
 def main():
     relative_paths = {
-        'source': '../../notes/',
-        'destination': '../../readingbricks/markdown_notes/',
-        'counts':  '../../counts_of_tags.tsv'
+        'source':
+            '../../readingbricks/notes/',
+        'destination':
+            '../../readingbricks/infrastructure/flask/markdown_notes/',
+        'counts':
+            '../../readingbricks/supplementary/counts_of_tags.tsv'
     }
     absolute_paths = {
         k: convert_to_absolute_path(v) for k, v in relative_paths.items()

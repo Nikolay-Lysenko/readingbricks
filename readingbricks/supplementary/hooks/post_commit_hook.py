@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# Be sure that a copy of this file is placed to `../.git/hooks` directory
-# under name `post-commit` (without extension).
+# Be sure that a copy of this file is placed to `../../../.git/hooks`
+# directory under name `post-commit` (without extension).
 
 
 """
