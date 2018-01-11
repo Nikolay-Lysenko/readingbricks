@@ -109,5 +109,5 @@ ENV/
 nohup.out
 
 # Output
-.db
+*.db
 notes_for_the_last_query.ipynb
