@@ -32,24 +32,23 @@ def index() -> str:
         for line in source_file:
             tags_with_counts.append(line.split('\t'))
     home_url = url_for('index', _external=True)
-    link_names = [tag.capitalize().replace('_', ' ') +
-                  ' (число заметок: {})'.format(count.strip())
-                  for (tag, count) in tags_with_counts]
+    link_names = [
+        f'{tag} ({count.strip()})' for (tag, count) in tags_with_counts
+    ]
     links_to_tags = [
-        f'<p><a href={home_url}tags/{tag}>{name}</a></p>\n'
+        f'<a href={home_url}tags/{tag} class="button">{name}</a>\n'
         for (tag, counts), name in zip(tags_with_counts, link_names)
     ]
     lines_in_html.extend(links_to_tags)
-    content_in_html = Markup(''.join(lines_in_html))
-    title = "Главная"
-    content_with_css = render_template('regular_page.html', **locals())
-    content_with_css = content_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
+    tags_cloud = Markup(''.join(lines_in_html))
+    content_with_css = render_template('index.html', **locals())
     return content_with_css
 
 
 def convert_note_from_markdown_to_html(note_title: str) -> Markup:
     """
-    Convert note stored as a Markdown file into string with HTML.
+    Convert note stored as a Markdown file into `Markup` instance
+    with HTML inside.
     """
     rel_requested_path = f'markdown_notes/{note_title}.md'
     abs_requested_path = os.path.dirname(__file__) + '/' + rel_requested_path

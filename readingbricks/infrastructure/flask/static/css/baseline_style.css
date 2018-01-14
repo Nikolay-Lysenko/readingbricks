@@ -7,18 +7,6 @@ nav {
     left: 2.5%;
     width: 10%;
 }
-.button {
-    background-color: #f1ece8;
-    border: none;
-    color: black;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
 div {
     margin: auto;
     width: 70%;
@@ -36,6 +24,22 @@ h3, h4, p {
 /* Suppress indenting text relatively a list marker that is indented itself. */
 li > p {
     text-indent: 0px;
+}
+
+.button {
+    background-color: #f1ece8;
+    border: none;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+#tags_cloud {
+    text-align: center;
 }
 
 
