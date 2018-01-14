@@ -18,8 +18,8 @@ Currently, there are a small number of notes and so there is no need in complica
 ## How to use it?
 
 There are two main interfaces that allow browsing notes efficiently:
-* Jupyter-based (it is mature, but its potential is limited),
-* Flask-based (now it is under development, but it will be the recommended way in the future).
+* Jupyter-based (now it is the recommended way),
+* Flask-based (it will be the recommended way in the future).
 
 #### Jupyter-based interface
 
@@ -40,7 +40,15 @@ After your query is run, look at the freshly created file named `notes_for_the_l
 
 #### Flask-based interface
 
-It will be launched soon. All necessary instructions will be provided here.
+To use this interface, you need to create a virtual environment (or `conda` environment) with Python 3.6 and packages listed in `readingbricks/infrastructure/flask/requirements.txt`. Activate this environment and run the following commands:
+```
+python readingbricks/infrastructure/flask/db_updater.py
+export FLASK_APP=readingbricks/infrastructure/flask/app_runner.py
+python -m flask run
+```
+The first command updates binary database for the application and the latter two comands are the standard commands for starting Flask application.
+
+Then open your web browser and go to `127.0.0.1:5000`. Again, enjoy reading!
 
 ## How to contribute?
 
