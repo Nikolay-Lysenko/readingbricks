@@ -15,7 +15,7 @@ from warnings import warn
 from copy import copy
 
 sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementary/hooks')
+    os.path.join(os.path.dirname(__file__), '../../supplementaries/hooks')
 )
 from pre_commit_hook import extract_cells
 
@@ -87,7 +87,7 @@ def validate_and_preprocess_cli_args(
         namespace with preprocessed arguments
     """
     valid_tags = []
-    relative_path = '../../supplementary/counts_of_tags.tsv'
+    relative_path = '../../supplementaries/counts_of_tags.tsv'
     absolute_path = os.path.join(os.path.dirname(__file__), relative_path)
     with open(absolute_path) as tags_file:
         for line in tags_file:

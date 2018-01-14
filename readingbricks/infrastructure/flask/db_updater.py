@@ -18,7 +18,7 @@ from contextlib import contextmanager
 import sqlite3
 
 sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementary/hooks')
+    os.path.join(os.path.dirname(__file__), '../../supplementaries/hooks')
 )
 from pre_commit_hook import extract_cells
 

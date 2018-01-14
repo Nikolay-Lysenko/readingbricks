@@ -25,7 +25,7 @@ def index() -> str:
     Render home page.
     """
     lines_in_html = ['<h2>На данный момент доступны следующие метки:</h2>\n']
-    rel_path_to_tags = '../../supplementary/counts_of_tags.tsv'
+    rel_path_to_tags = '../../supplementaries/counts_of_tags.tsv'
     abs_path_to_tags = os.path.dirname(__file__) + '/' + rel_path_to_tags
     tags_with_counts = []
     with open(abs_path_to_tags, 'r') as source_file:

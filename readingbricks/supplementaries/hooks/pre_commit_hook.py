@@ -130,7 +130,7 @@ def main():
         'destination':
             '../../readingbricks/infrastructure/flask/markdown_notes/',
         'counts':
-            '../../readingbricks/supplementary/counts_of_tags.tsv'
+            '../../readingbricks/supplementaries/counts_of_tags.tsv'
     }
     absolute_paths = {
         k: convert_to_absolute_path(v) for k, v in relative_paths.items()
