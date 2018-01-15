@@ -46,7 +46,7 @@ python readingbricks/infrastructure/flask/db_updater.py
 export FLASK_APP=readingbricks/infrastructure/flask/app_runner.py
 python -m flask run
 ```
-The first command updates binary database for the application and the latter two comands are the standard commands for starting Flask application.
+The first command updates binary database for the application and the latter two comands are the standard commands for starting a Flask application.
 
 Then open your web browser and go to `127.0.0.1:5000`. Again, enjoy reading!
 
@@ -61,5 +61,5 @@ When working on a pull request, keep in mind internal structure of the project. 
 * Automatically created files. They never should be updated manually;
 * Infrastructure code. It can be stored inside these directories:
     - `readingbricks/supplementaries/hooks` (Git hooks),
-    - `readingblocks/infrastructure/jupyter` (Jupyter interface),
-    - `readingblocks/infrastructure/flask` (Flask interface).
+    - `readingblocks/infrastructure/jupyter` (Jupyter-based interface),
+    - `readingblocks/infrastructure/flask` (Flask-based interface).
