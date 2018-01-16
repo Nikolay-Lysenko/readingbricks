@@ -9,18 +9,12 @@ pre-commit hook.
 """
 
 
-import sys
 import os
+import sys
+import sqlite3
 from collections import defaultdict
 from typing import Dict, Any
 from contextlib import contextmanager
-
-import sqlite3
-
-sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
-)
-from jupyter_tools import extract_cells
 
 
 def update_mapping_of_tags_to_notes(
@@ -99,6 +93,12 @@ def create_or_refresh_db() -> type(None):
         k: os.path.join(os.path.dirname(__file__), v)
         for k, v in relative_paths.items()
     }
+
+    sys.path.append(
+        os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
+    )
+    from jupyter_tools import extract_cells
+
     tag_to_notes = defaultdict(lambda: [])
     for cell in extract_cells(absolute_paths['source']):
         tag_to_notes = update_mapping_of_tags_to_notes(tag_to_notes, cell)

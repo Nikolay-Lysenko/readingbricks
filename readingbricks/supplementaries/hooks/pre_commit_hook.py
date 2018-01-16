@@ -25,13 +25,6 @@ import sys
 from collections import Counter
 from typing import List, Dict, Any
 
-sys.path.append(
-    os.path.join(
-        os.path.dirname(__file__), '../../readingbricks/supplementaries/tools'
-    )
-)
-from jupyter_tools import extract_cells
-
 
 def convert_to_absolute_path(relative_path: str) -> str:
     """
@@ -100,6 +93,12 @@ def main():
     absolute_paths = {
         k: convert_to_absolute_path(v) for k, v in relative_paths.items()
     }
+
+    sys.path.append(
+        convert_to_absolute_path('../../readingbricks/supplementaries/tools')
+    )
+    from jupyter_tools import extract_cells
+
     tags = []
     for cell in extract_cells(absolute_paths['source']):
         validate_cell(cell)

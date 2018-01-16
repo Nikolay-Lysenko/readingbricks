@@ -12,11 +12,6 @@ import sys
 import os
 from typing import List, Dict, Any
 
-sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
-)
-from jupyter_tools import extract_cells
-
 
 def clear_directory(absolute_dir_name: str) -> type(None):
     """
@@ -74,7 +69,14 @@ def refresh_directory_with_markdown_notes() -> type(None):
         k: os.path.join(os.path.dirname(__file__), v)
         for k, v in relative_paths.items()
     }
+
     clear_directory(absolute_paths['destination'])
+
+    sys.path.append(
+        os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
+    )
+    from jupyter_tools import extract_cells
+
     for cell in extract_cells(absolute_paths['source']):
         copy_cell_content_to_markdown_file(cell, absolute_paths['destination'])
 

@@ -1,5 +1,6 @@
 """
-It is just a small file with auxiliaries.
+It is just a small file for work with files in Jupyter format,
+i.e., files that have `.ipynb` extension.
 
 @author: Nikolay Lysenko
 """
@@ -16,9 +17,9 @@ def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     Jupyter notebooks from there.
     """
     file_names = [x for x in os.listdir(path_to_dir)
-                  if os.path.isfile(path_to_dir + x)]
+                  if os.path.isfile(os.path.join(path_to_dir, x))]
     for file_name in file_names:
-        with open(path_to_dir + file_name) as source_file:
+        with open(os.path.join(path_to_dir, file_name)) as source_file:
             cells = json.load(source_file)['cells']
             for cell in cells:
                 yield cell
