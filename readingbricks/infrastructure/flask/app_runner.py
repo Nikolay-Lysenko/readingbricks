@@ -14,8 +14,8 @@ from flask import Flask, render_template, url_for
 from flask_misaka import Misaka, markdown
 from markupsafe import Markup
 
-from db_updater import create_or_refresh_db
-from notes_collector import refresh_directory_with_markdown_notes
+from db_control import create_or_refresh_db
+from markdown_notes_control import refresh_directory_with_markdown_notes
 
 
 app = Flask(__name__)

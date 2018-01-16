@@ -1,7 +1,8 @@
 """
 This script parses notes in Jupyter format, converts their content
 to Markdown, and stores each note in a separate file within a
-directory that is managed by this script.
+directory that is managed by this script. Also this script can
+remove files that correspond to removed or renamed notes.
 
 @author: Nikolay Lysenko
 """
@@ -19,7 +20,7 @@ from jupyter_tools import extract_cells
 
 def clear_directory(absolute_dir_name: str) -> type(None):
     """
-    Delete all files from a directory
+    Delete all files from a directory.
     """
     for file_name in os.listdir(absolute_dir_name):
         file_name = os.path.join(absolute_dir_name, file_name)
