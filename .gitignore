@@ -100,6 +100,9 @@ ENV/
 # mypy
 .mypy_cache/
 
+# SQLite databases
+*.db
+
 # Other editors
 *~
 .idea/
@@ -109,5 +112,5 @@ ENV/
 nohup.out
 
 # Output
-*.db
+markdown_notes/
 notes_for_the_last_query.ipynb

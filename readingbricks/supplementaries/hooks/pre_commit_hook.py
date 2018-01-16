@@ -8,11 +8,10 @@ This script does tasks that are needed for update of both Flask
 and Jupyter interfaces of the project. Generally speaking, not all
 tasks should be done here, because it is desired to have no
 dependencies other than built-in Python packages in Git hooks.
-The list of covered tasks is as follows:
+As of now, the list of covered tasks consists of these element:
 1) Update a file with counts of tags that appear at least once
    in the most recent editions of notes;
-2) Extract cells content from Jupyter notebooks and place it to
-   Markdown files available to Flask application.
+2) Validate human-written notes.
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
@@ -50,45 +49,22 @@ def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
                 yield cell
 
 
+def validate_cell(cell: Dict[str, Any]) -> type(None):
+    """
+    Assert that content of cell is in accordance with assumptions
+    lying behind the project.
+    """
+    content = [line.rstrip('\n') for line in cell['source']]
+    msg = f"Cell header must be h2 (i.e. start with ##), found: {content[0]}"
+    assert content[0].startswith('## '), msg
+
+
 def update_list_of_tags(tags: List[str], cell: Dict[str, Any]) -> List[str]:
     """
     Update list of tags occurrences based on a current cell.
     """
     tags.extend(cell['metadata']['tags'])
     return tags
-
-
-def insert_blank_line_before_each_list(content: List[str]) -> List[str]:
-    """
-    Insert blank line before each Markdown list when it is needed
-    for Misaka parser.
-    """
-    list_markers = ['* ', '- ', '+ ']
-    result = []
-    for first, second in zip(content, content[1:]):
-        result.append(first)
-        if any([second.startswith(x) for x in list_markers]) and first:
-            result.append('')
-    result.append(content[-1])
-    return result
-
-
-def copy_cell_content_to_markdown_file(
-        cell: Dict[str, Any], destination_dir_path: str
-        ) -> type(None):
-    """
-    Extract content of cell and save it as Markdown file in the
-    special directory.
-    """
-    content = [line.rstrip('\n') for line in cell['source']]
-    content = insert_blank_line_before_each_list(content)
-    msg = f"Cell header must be h2 (i.e. start with ##), found: {content[0]}"
-    assert content[0].startswith('## '), msg
-    destination_name = content[0].lstrip('## ')
-    destination_path = destination_dir_path + destination_name + '.md'
-    with open(destination_path, 'w') as destination_file:
-        for line in content:
-            destination_file.write(line + '\n')
 
 
 def write_tag_counts(tags: List[str], absolute_path: str) -> type(None):
@@ -125,20 +101,16 @@ def add_to_commit(path_from_git_root: str) -> type(None):
 
 def main():
     relative_paths = {
-        'source':
-            '../../readingbricks/notes/',
-        'destination':
-            '../../readingbricks/infrastructure/flask/markdown_notes/',
-        'counts':
-            '../../readingbricks/supplementaries/counts_of_tags.tsv'
+        'source': '../../readingbricks/notes/',
+        'counts': '../../readingbricks/supplementaries/counts_of_tags.tsv'
     }
     absolute_paths = {
         k: convert_to_absolute_path(v) for k, v in relative_paths.items()
     }
     tags = []
     for cell in extract_cells(absolute_paths['source']):
+        validate_cell(cell)
         tags = update_list_of_tags(tags, cell)
-        copy_cell_content_to_markdown_file(cell, absolute_paths['destination'])
     write_tag_counts(tags, absolute_paths['counts'])
     for path in [v.lstrip('../../')
                  for k, v in relative_paths.items() if k != 'source']:

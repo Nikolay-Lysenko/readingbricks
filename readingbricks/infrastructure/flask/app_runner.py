@@ -8,10 +8,14 @@ This is the script that launches Flask app.
 import os
 import sqlite3
 from functools import reduce
+from typing import Tuple
 
 from flask import Flask, render_template, url_for
 from flask_misaka import Misaka, markdown
 from markupsafe import Markup
+
+from db_updater import create_or_refresh_db
+from notes_collector import refresh_directory_with_markdown_notes
 
 
 app = Flask(__name__)
@@ -101,8 +105,10 @@ def page_for_tag(tag: str) -> str:
 
 
 @app.errorhandler(404)
-def page_not_found(_) -> str:
+def page_not_found(_) -> Tuple[str, int]:
     return render_template('404.html'), 404
 
 
+create_or_refresh_db()
+refresh_directory_with_markdown_notes()
 app.run(debug=True)

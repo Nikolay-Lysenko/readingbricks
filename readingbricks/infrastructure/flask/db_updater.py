@@ -87,7 +87,10 @@ def write_tag_to_notes_mapping_to_db(
     conn.close()
 
 
-def main():
+def create_or_refresh_db() -> type(None):
+    """
+    Create SQLite database if it does not exist or update it else.
+    """
     relative_paths = {
         'source': '../../notes/',
         'destination': 'tag_to_notes.db'
@@ -105,4 +108,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    create_or_refresh_db()

@@ -42,24 +42,24 @@ After your query is run, look at the freshly created file named `notes_for_the_l
 
 To use this interface, you need to create a virtual environment (or `conda` environment) with Python 3.6 and packages listed in `readingbricks/infrastructure/flask/requirements.txt`. Activate this environment and run the following commands:
 ```
-python readingbricks/infrastructure/flask/db_updater.py
 export FLASK_APP=readingbricks/infrastructure/flask/app_runner.py
 python -m flask run
 ```
-The first command updates binary database for the application and the latter two comands are the standard commands for starting a Flask application.
+These two comands are the standard commands for starting a Flask application.
 
-Then open your web browser and go to `127.0.0.1:5000`. Again, enjoy reading!
+After local server is started, open your web browser and go to `127.0.0.1:5000`. Again, enjoy reading!
 
 ## How to contribute?
 
 Everyone can create a pull request.
 
-Note that it is strongly recommended to update counts of tags and Markdown files for Flask version automatically. This is easy — just copy and rename files from `readingbricks/supplementaries/hooks` directory according to instructions that are placed inside of them right below shebang. If it is done correctly, Git hooks will refresh tag statistics and other necessary files for you.
+Note that it is strongly recommended to update counts of tags automatically. This is easy — just copy and rename files from `readingbricks/supplementaries/hooks` directory according to instructions that are placed inside of them right below shebang. If it is done correctly, Git hooks will refresh tag statistics and other necessary files for you. Also they will validate your notes.
 
 When working on a pull request, keep in mind internal structure of the project. It is assumed that there are three types of files:
 * Notes written by humans. All of them must be inside `readingbricks/notes` directory in `ipynb` format;
-* Automatically created files. They never should be updated manually;
+* Automatically created files. They never should be updated manually and all of them are in `.gitignore`;
 * Infrastructure code. It can be stored inside these directories:
-    - `readingbricks/supplementaries/hooks` (Git hooks),
     - `readingblocks/infrastructure/jupyter` (Jupyter-based interface),
-    - `readingblocks/infrastructure/flask` (Flask-based interface).
+    - `readingblocks/infrastructure/flask` (Flask-based interface),
+    - `readingbricks/supplementaries/tools` (small utilities that are used by both interfaces),
+    - `readingbricks/supplementaries/hooks` (Git hooks).
