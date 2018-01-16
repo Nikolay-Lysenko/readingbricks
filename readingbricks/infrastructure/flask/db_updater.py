@@ -18,9 +18,9 @@ from contextlib import contextmanager
 import sqlite3
 
 sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementaries/hooks')
+    os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
 )
-from pre_commit_hook import extract_cells
+from jupyter_tools import extract_cells
 
 
 def update_mapping_of_tags_to_notes(

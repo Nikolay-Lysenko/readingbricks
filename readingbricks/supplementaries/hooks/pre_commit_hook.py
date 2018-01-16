@@ -21,9 +21,16 @@ is placed and named correctly.
 
 import os
 import subprocess
-import json
+import sys
 from collections import Counter
-from typing import List, Dict, Generator, Any
+from typing import List, Dict, Any
+
+sys.path.append(
+    os.path.join(
+        os.path.dirname(__file__), '../../readingbricks/supplementaries/tools'
+    )
+)
+from jupyter_tools import extract_cells
 
 
 def convert_to_absolute_path(relative_path: str) -> str:
@@ -33,20 +40,6 @@ def convert_to_absolute_path(relative_path: str) -> str:
     script_directory = os.path.dirname(__file__)
     absolute_path = os.path.join(script_directory, relative_path)
     return absolute_path
-
-
-def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
-    """
-    Walk through the specified directory and yield cells of
-    Jupyter notebooks from there.
-    """
-    file_names = [x for x in os.listdir(path_to_dir)
-                  if os.path.isfile(path_to_dir + x)]
-    for file_name in file_names:
-        with open(path_to_dir + file_name) as source_file:
-            cells = json.load(source_file)['cells']
-            for cell in cells:
-                yield cell
 
 
 def validate_cell(cell: Dict[str, Any]) -> type(None):

@@ -12,9 +12,9 @@ import os
 from typing import List, Dict, Any
 
 sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementaries/hooks')
+    os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
 )
-from pre_commit_hook import extract_cells
+from jupyter_tools import extract_cells
 
 
 def clear_directory(absolute_dir_name: str) -> type(None):

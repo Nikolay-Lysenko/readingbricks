@@ -15,9 +15,9 @@ from warnings import warn
 from copy import copy
 
 sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementaries/hooks')
+    os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
 )
-from pre_commit_hook import extract_cells
+from jupyter_tools import extract_cells
 
 
 def parse_cli_args() -> argparse.Namespace:
