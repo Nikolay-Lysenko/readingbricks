@@ -28,7 +28,7 @@ def insert_blank_line_before_each_list(content: List[str]) -> List[str]:
     Insert blank line before each Markdown list when it is needed
     for Misaka parser.
     """
-    list_markers = ['* ', '- ', '+ ']
+    list_markers = ['* ', '- ', '+ ', '1. ']
     result = []
     for first, second in zip(content, content[1:]):
         result.append(first)
