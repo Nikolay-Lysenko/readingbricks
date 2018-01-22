@@ -35,14 +35,24 @@ def convert_to_absolute_path(relative_path: str) -> str:
     return absolute_path
 
 
-def validate_cell(cell: Dict[str, Any]) -> type(None):
+def validate_cell_header(
+        headers: List[str], cell: Dict[str, Any]
+        ) -> List[str]:
     """
-    Assert that content of cell is in accordance with assumptions
-    lying behind the project.
+    Assert that header of cell is in accordance with assumptions
+    lying behind the project and update list of cell headers.
     """
     content = [line.rstrip('\n') for line in cell['source']]
-    msg = f"Cell header must be h2 (i.e. start with ##), found: {content[0]}"
-    assert content[0].startswith('## '), msg
+    curr_header = content[0]
+    headers.append(curr_header)
+
+    msg = f"Cell header must be h2 (i.e. start with ##), found: {curr_header}"
+    assert curr_header.startswith('## '), msg
+
+    msg = f"Each header must appear only once, '{curr_header}' is duplicated"
+    assert len(headers) == len(set(headers))
+
+    return headers
 
 
 def update_list_of_tags(tags: List[str], cell: Dict[str, Any]) -> List[str]:
@@ -99,9 +109,10 @@ def main():
     )
     from jupyter_tools import extract_cells
 
+    headers = []
     tags = []
     for cell in extract_cells(absolute_paths['source']):
-        validate_cell(cell)
+        headers = validate_cell_header(headers, cell)
         tags = update_list_of_tags(tags, cell)
     write_tag_counts(tags, absolute_paths['counts'])
     for path in [v.lstrip('../../')
