@@ -14,6 +14,7 @@ Currently, there are a small number of notes and so there is no need in complica
 - [ ] Support of tags hierarchy
 - [ ] Full-text search
 - [ ] Ranking based on flexible parameters
+- [ ] On-demand making of customized texts from notes 
 
 ## How to use it?
 
