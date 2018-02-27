@@ -58,7 +58,7 @@ Note that it is strongly recommended to update counts of tags automatically. Thi
 
 When working on a pull request, keep in mind internal structure of the project. It is assumed that there are three types of files:
 * Notes written by humans. All of them must be inside `readingbricks/notes` directory in `ipynb` format;
-* Automatically created files. They never should be updated manually and all of them are in `.gitignore`;
+* Automatically created files. They never should be updated manually and most of them are in `.gitignore`;
 * Infrastructure code. It can be stored inside these directories:
     - `readingbricks/infrastructure/jupyter` (Jupyter-based interface),
     - `readingbricks/infrastructure/flask` (Flask-based interface),
