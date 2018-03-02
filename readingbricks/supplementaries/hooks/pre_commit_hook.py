@@ -105,9 +105,9 @@ def main():
     }
 
     sys.path.append(
-        convert_to_absolute_path('../../readingbricks/supplementaries/tools')
+        convert_to_absolute_path('../../readingbricks/supplementaries/utils')
     )
-    from jupyter_tools import extract_cells
+    from ipynb_utils import extract_cells
 
     headers = []
     tags = []

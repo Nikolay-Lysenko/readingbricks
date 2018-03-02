@@ -15,9 +15,9 @@ from warnings import warn
 from copy import copy
 
 sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
+    os.path.join(os.path.dirname(__file__), '../../supplementaries/utils')
 )
-from jupyter_tools import extract_cells
+from ipynb_utils import extract_cells
 
 
 def parse_cli_args() -> argparse.Namespace:

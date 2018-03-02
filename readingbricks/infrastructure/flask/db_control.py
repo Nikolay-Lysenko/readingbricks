@@ -95,9 +95,9 @@ def create_or_refresh_db() -> type(None):
     }
 
     sys.path.append(
-        os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
+        os.path.join(os.path.dirname(__file__), '../../supplementaries/utils')
     )
-    from jupyter_tools import extract_cells
+    from ipynb_utils import extract_cells
 
     tag_to_notes = defaultdict(lambda: [])
     for cell in extract_cells(absolute_paths['source']):

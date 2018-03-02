@@ -1,5 +1,5 @@
 """
-It is just a small file for work with files in Jupyter format,
+It is just a small module for work with files in Jupyter format,
 i.e., files that have `.ipynb` extension.
 
 @author: Nikolay Lysenko

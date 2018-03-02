@@ -73,9 +73,9 @@ def refresh_directory_with_markdown_notes() -> type(None):
     clear_directory(absolute_paths['destination'])
 
     sys.path.append(
-        os.path.join(os.path.dirname(__file__), '../../supplementaries/tools')
+        os.path.join(os.path.dirname(__file__), '../../supplementaries/utils')
     )
-    from jupyter_tools import extract_cells
+    from ipynb_utils import extract_cells
 
     for cell in extract_cells(absolute_paths['source']):
         copy_cell_content_to_markdown_file(cell, absolute_paths['destination'])
