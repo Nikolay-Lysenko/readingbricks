@@ -1,5 +1,5 @@
 """
-This is the script that launches Flask app.
+This module contains web pages for Flask application.
 
 @author: Nikolay Lysenko
 """
@@ -8,17 +8,20 @@ This is the script that launches Flask app.
 import os
 import sqlite3
 from functools import reduce
-from typing import Tuple
+from typing import Union, Tuple
 
-from flask import Flask, render_template, url_for
-from flask_misaka import Misaka, markdown
+from flask import render_template, url_for
+from flask_misaka import Misaka
 from markupsafe import Markup
 
-from db_control import create_or_refresh_db
-from markdown_notes_control import refresh_directory_with_markdown_notes
+from readingbricks import app
+from readingbricks.path_configuration import (
+    get_path_to_counts_of_tags,
+    get_path_to_markdown_notes,
+    get_path_to_db
+)
 
 
-app = Flask(__name__)
 markdown_preprocessor = Misaka()
 markdown_preprocessor.init_app(app)
 
@@ -29,10 +32,8 @@ def index() -> str:
     Render home page.
     """
     lines_in_html = ['<h2>На данный момент доступны следующие метки:</h2>\n']
-    rel_path_to_tags = '../../supplementaries/counts_of_tags.tsv'
-    abs_path_to_tags = os.path.dirname(__file__) + '/' + rel_path_to_tags
     tags_with_counts = []
-    with open(abs_path_to_tags, 'r') as source_file:
+    with open(get_path_to_counts_of_tags(), 'r') as source_file:
         for line in source_file:
             tags_with_counts.append(line.split('\t'))
     home_url = url_for('index', _external=True)
@@ -54,8 +55,8 @@ def convert_note_from_markdown_to_html(note_title: str) -> Markup:
     Convert note stored as a Markdown file into `Markup` instance
     with HTML inside.
     """
-    rel_requested_path = f'markdown_notes/{note_title}.md'
-    abs_requested_path = os.path.dirname(__file__) + '/' + rel_requested_path
+    dir_path = get_path_to_markdown_notes()
+    abs_requested_path = os.path.join(dir_path, f'{note_title}.md')
     if not os.path.isfile(abs_requested_path):
         return page_not_found(note_title)
     with open(abs_requested_path, 'r') as source_file:
@@ -80,14 +81,12 @@ def page_with_note(note_title: str) -> str:
 
 
 @app.route('/tags/<tag>')
-def page_for_tag(tag: str) -> str:
+def page_for_tag(tag: str) -> Union[str, Tuple[str, int]]:
     """
     Render in HTML a page with all notes that have the specified tag.
     """
-    relative_path_to_db = 'tag_to_notes.db'
-    absolute_path_to_db = os.path.dirname(__file__) + '/' + relative_path_to_db
     try:
-        conn = sqlite3.connect(absolute_path_to_db)
+        conn = sqlite3.connect(get_path_to_db())
         cur = conn.cursor()
         cur.execute(f"SELECT note_title FROM {tag}")
         query_result = cur.fetchall()
@@ -107,8 +106,3 @@ def page_for_tag(tag: str) -> str:
 @app.errorhandler(404)
 def page_not_found(_) -> Tuple[str, int]:
     return render_template('404.html'), 404
-
-
-create_or_refresh_db()
-refresh_directory_with_markdown_notes()
-app.run(debug=True)

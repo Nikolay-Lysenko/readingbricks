@@ -8,15 +8,22 @@ remove files that correspond to removed or renamed notes.
 """
 
 
-import sys
 import os
 from typing import List, Dict, Any
 
+from readingbricks.ipynb_utils import extract_cells
+from readingbricks.path_configuration import (
+    get_path_to_ipynb_notes, get_path_to_markdown_notes
+)
 
-def clear_directory(absolute_dir_name: str) -> type(None):
+
+def provide_empty_directory(absolute_dir_name: str) -> type(None):
     """
-    Delete all files from a directory.
+    Make directory if it does not exist and delete all files
+    from there if it is not empty.
     """
+    if not os.path.isdir(absolute_dir_name):
+        os.mkdir(absolute_dir_name)
     for file_name in os.listdir(absolute_dir_name):
         file_name = os.path.join(absolute_dir_name, file_name)
         if os.path.isfile(file_name):
@@ -62,21 +69,11 @@ def refresh_directory_with_markdown_notes() -> type(None):
     with the ones based on the current state of files from master
     directory with notes.
     """
-    relative_paths = {
-        'source': '../../notes/', 'destination': 'markdown_notes'
-    }
     absolute_paths = {
-        k: os.path.join(os.path.dirname(__file__), v)
-        for k, v in relative_paths.items()
+        'source': get_path_to_ipynb_notes(),
+        'destination': get_path_to_markdown_notes()
     }
-
-    clear_directory(absolute_paths['destination'])
-
-    sys.path.append(
-        os.path.join(os.path.dirname(__file__), '../../supplementaries/utils')
-    )
-    from ipynb_utils import extract_cells
-
+    provide_empty_directory(absolute_paths['destination'])
     for cell in extract_cells(absolute_paths['source']):
         copy_cell_content_to_markdown_file(cell, absolute_paths['destination'])
 

@@ -9,12 +9,15 @@ pre-commit hook.
 """
 
 
-import os
-import sys
 import sqlite3
 from collections import defaultdict
 from typing import Dict, Any
 from contextlib import contextmanager
+
+from readingbricks.ipynb_utils import extract_cells
+from readingbricks.path_configuration import (
+    get_path_to_ipynb_notes, get_path_to_db
+)
 
 
 def update_mapping_of_tags_to_notes(
@@ -85,20 +88,10 @@ def create_or_refresh_db() -> type(None):
     """
     Create SQLite database if it does not exist or update it else.
     """
-    relative_paths = {
-        'source': '../../notes/',
-        'destination': 'tag_to_notes.db'
-    }
     absolute_paths = {
-        k: os.path.join(os.path.dirname(__file__), v)
-        for k, v in relative_paths.items()
+        'source': get_path_to_ipynb_notes(),
+        'destination': get_path_to_db()
     }
-
-    sys.path.append(
-        os.path.join(os.path.dirname(__file__), '../../supplementaries/utils')
-    )
-    from ipynb_utils import extract_cells
-
     tag_to_notes = defaultdict(lambda: [])
     for cell in extract_cells(absolute_paths['source']):
         tag_to_notes = update_mapping_of_tags_to_notes(tag_to_notes, cell)

@@ -97,15 +97,15 @@ def add_to_commit(path_from_git_root: str) -> type(None):
 
 def main():
     relative_paths = {
-        'source': '../../readingbricks/notes/',
-        'counts': '../../readingbricks/supplementaries/counts_of_tags.tsv'
+        'source': '../../notes/',
+        'counts': '../../supplementaries/counts_of_tags.tsv'
     }
     absolute_paths = {
         k: convert_to_absolute_path(v) for k, v in relative_paths.items()
     }
 
     sys.path.append(
-        convert_to_absolute_path('../../readingbricks/supplementaries/utils')
+        convert_to_absolute_path('../../readingbricks/')
     )
     from ipynb_utils import extract_cells
 

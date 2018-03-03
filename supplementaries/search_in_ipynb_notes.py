@@ -6,7 +6,6 @@ according to user query.
 """
 
 
-import sys
 import os
 import json
 import argparse
@@ -14,10 +13,10 @@ from typing import Set, Tuple
 from warnings import warn
 from copy import copy
 
-sys.path.append(
-    os.path.join(os.path.dirname(__file__), '../../supplementaries/utils')
+from readingbricks.ipynb_utils import extract_cells
+from readingbricks.path_configuration import (
+    get_path_to_ipynb_notes, get_path_to_counts_of_tags
 )
-from ipynb_utils import extract_cells
 
 
 def parse_cli_args() -> argparse.Namespace:
@@ -87,9 +86,7 @@ def validate_and_preprocess_cli_args(
         namespace with preprocessed arguments
     """
     valid_tags = []
-    relative_path = '../../supplementaries/counts_of_tags.tsv'
-    absolute_path = os.path.join(os.path.dirname(__file__), relative_path)
-    with open(absolute_path) as tags_file:
+    with open(get_path_to_counts_of_tags(), 'r') as tags_file:
         for line in tags_file:
             valid_tags.append(line.split('\t')[0])
     template, tags = parse_expression(cli_args.expression)
@@ -110,17 +107,18 @@ def compose_notebook(template: str) -> type(None):
     :return:
         None
     """
-    relative_path = '../../notes/'
-    absolute_path = os.path.join(os.path.dirname(__file__), relative_path)
+    path_to_notes = get_path_to_ipynb_notes()
     relevant_cells = []
-    for cell in extract_cells(absolute_path):
+    for cell in extract_cells(path_to_notes):
         if eval(template.format(str(cell['metadata']['tags']))):
             relevant_cells.append(cell)
 
-    file_names = [x for x in os.listdir(absolute_path)
-                  if os.path.isfile(absolute_path + x)]
+    file_names = [
+        x for x in os.listdir(path_to_notes)
+        if os.path.isfile(os.path.join(path_to_notes, x))
+    ]
     arbitrary_file_name = file_names[0]
-    with open(absolute_path + arbitrary_file_name) as source_file:
+    with open(os.path.join(path_to_notes, arbitrary_file_name)) as source_file:
         all_content = json.load(source_file)
 
     content = {k: v for k, v in all_content.items() if k != 'cells'}
