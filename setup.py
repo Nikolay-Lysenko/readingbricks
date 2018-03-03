@@ -27,5 +27,7 @@ setup(
     packages=find_packages(exclude=['notes', 'tests', 'supplementaries']),
     include_package_data=True,  # For CSS files and so on.
     python_requires='>=3.6',
-    install_requires=['Flask', 'Flask-Markdown', 'Flask-Misaka']
+    install_requires=[
+        'Flask', 'Flask-Markdown', 'Flask-Misaka', 'pyparsing'
+    ]
 )

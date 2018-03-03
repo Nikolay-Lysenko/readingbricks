@@ -7,8 +7,9 @@ This module contains web pages for Flask application.
 
 import os
 import sqlite3
+import contextlib
 from functools import reduce
-from typing import Union, Tuple
+from typing import Union, List, Tuple
 
 from flask import render_template, url_for
 from flask_misaka import Misaka
@@ -20,6 +21,7 @@ from readingbricks.path_configuration import (
     get_path_to_markdown_notes,
     get_path_to_db
 )
+from readingbricks.user_query_processing import find_all_relevant_notes
 
 
 markdown_preprocessor = Misaka()
@@ -80,26 +82,48 @@ def page_with_note(note_title: str) -> str:
     return content_with_css
 
 
+def page_for_list_of_titles(note_titles: List[str], page_title: str) -> str:
+    """
+    Render in HTML a page with all notes from the specified list.
+    """
+    notes_content = []
+    for note_title in note_titles:
+        notes_content.append(convert_note_from_markdown_to_html(note_title))
+    content_in_html = reduce(lambda x, y: x + y, notes_content)
+    content_with_css = render_template('regular_page.html', **locals())
+    content_with_css = content_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
+    return content_with_css
+
+
 @app.route('/tags/<tag>')
 def page_for_tag(tag: str) -> Union[str, Tuple[str, int]]:
     """
     Render in HTML a page with all notes that have the specified tag.
     """
     try:
-        conn = sqlite3.connect(get_path_to_db())
-        cur = conn.cursor()
-        cur.execute(f"SELECT note_title FROM {tag}")
-        query_result = cur.fetchall()
+        with contextlib.closing(sqlite3.connect(get_path_to_db())) as conn:
+            with contextlib.closing(conn.cursor()) as cur:
+                cur.execute(f"SELECT note_title FROM {tag}")
+                query_result = cur.fetchall()
         note_titles = [x[0] for x in query_result]
     except sqlite3.OperationalError:
         return page_not_found(tag)
-    notes_content = []
-    for note_title in note_titles:
-        notes_content.append(convert_note_from_markdown_to_html(note_title))
-    content_in_html = reduce(lambda x, y: x + y, notes_content)
-    title = tag.capitalize().replace('_', ' ')
-    content_with_css = render_template('regular_page.html', **locals())
-    content_with_css = content_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
+    page_title = tag.capitalize().replace('_', ' ')
+    content_with_css = page_for_list_of_titles(note_titles, page_title)
+    return content_with_css
+
+
+@app.route('/query/<user_query>')
+def page_for_query(user_query: str) -> str:
+    """
+    Render in HTML a page with all notes that match user query
+    containing AND and OR operators.
+    """
+    user_query = user_query.replace('%20', ' ')
+    note_titles = find_all_relevant_notes(user_query)
+    content_with_css = page_for_list_of_titles(
+        note_titles, page_title=user_query
+    )
     return content_with_css
 
 
