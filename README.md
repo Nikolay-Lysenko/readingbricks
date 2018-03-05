@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Nikolay-Lysenko/readingbricks.svg?branch=master)](https://travis-ci.org/Nikolay-Lysenko/readingbricks)
+
 # ReadingBricks
 
 ## What is it?
