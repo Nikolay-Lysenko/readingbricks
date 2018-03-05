@@ -50,7 +50,7 @@ def validate_cell_header(
     assert curr_header.startswith('## '), msg
 
     msg = f"Each header must appear only once, '{curr_header}' is duplicated"
-    assert len(headers) == len(set(headers))
+    assert len(headers) == len(set(headers)), msg
 
     return headers
 

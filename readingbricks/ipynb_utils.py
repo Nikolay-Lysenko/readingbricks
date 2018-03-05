@@ -16,8 +16,10 @@ def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     Walk through the specified directory and yield cells of
     Jupyter notebooks from there.
     """
-    file_names = [x for x in os.listdir(path_to_dir)
-                  if os.path.isfile(os.path.join(path_to_dir, x))]
+    file_names = [
+        x for x in os.listdir(path_to_dir)
+        if os.path.isfile(os.path.join(path_to_dir, x)) and not x.endswith('~')
+    ]
     for file_name in file_names:
         with open(os.path.join(path_to_dir, file_name)) as source_file:
             cells = json.load(source_file)['cells']
