@@ -1,0 +1,22 @@
+language: python
+
+python:
+  - "3.6"
+
+install:
+  - pip install .
+
+branches:
+  only:
+  - master
+  - develop
+
+script:
+  - pytest
+
+notifications:
+  email:
+    recipients:
+      - nikolay.lysenko.1992@gmail.com
+    on_success: never
+    on_failure: always
