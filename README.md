@@ -75,4 +75,5 @@ When working on a pull request, keep in mind internal structure of the project. 
 * Infrastructure code. It can be stored at these locations:
     - `readingbricks` (Flask-based interface),
     - `supplementaries/hooks` (Git hooks),
-    - `supplementaries/search_in_jupyter_notes.py` (the only file for Jupyter-based interface).
+    - `supplementaries/search_in_jupyter_notes.py` (the only file for Jupyter-based interface),
+    - `tests` (tests for continuous integration).

@@ -17,12 +17,14 @@ class TestJupyterCellsExtraction(unittest.TestCase):
 
     def test_extract_cells(self):
         """
-        Test `extract_cells` function
+        Test `extract_cells` function.
 
         :return:
              None
         """
-        result = list(extract_cells('resources_for_tests/sample_notebooks'))
+        # Path is taken relatively `readingbricks` directory for `pytest`.
+        path = 'tests/resources_for_tests/sample_notebooks'
+        result = list(extract_cells(path))
         letters_content = sorted(
             [
                 cell['source']
