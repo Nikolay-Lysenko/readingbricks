@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 """
 This module contains web pages for Flask application.
 
@@ -11,7 +14,7 @@ import contextlib
 from functools import reduce
 from typing import Union, List, Tuple
 
-from flask import render_template, url_for
+from flask import render_template, url_for, request
 from flask_misaka import Misaka
 from markupsafe import Markup
 
@@ -60,7 +63,7 @@ def convert_note_from_markdown_to_html(note_title: str) -> Markup:
     dir_path = get_path_to_markdown_notes()
     abs_requested_path = os.path.join(dir_path, f'{note_title}.md')
     if not os.path.isfile(abs_requested_path):
-        return page_not_found(note_title)
+        return render_template('404.html')
     with open(abs_requested_path, 'r') as source_file:
         content_in_markdown = ''.join(source_file.read())
     content_in_html = markdown_preprocessor.render(
@@ -96,7 +99,7 @@ def page_for_list_of_titles(note_titles: List[str], page_title: str) -> str:
 
 
 @app.route('/tags/<tag>')
-def page_for_tag(tag: str) -> Union[str, Tuple[str, int]]:
+def page_for_tag(tag: str) -> str:
     """
     Render in HTML a page with all notes that have the specified tag.
     """
@@ -107,23 +110,29 @@ def page_for_tag(tag: str) -> Union[str, Tuple[str, int]]:
                 query_result = cur.fetchall()
         note_titles = [x[0] for x in query_result]
     except sqlite3.OperationalError:
-        return page_not_found(tag)
+        return render_template('404.html')
     page_title = tag.capitalize().replace('_', ' ')
     content_with_css = page_for_list_of_titles(note_titles, page_title)
     return content_with_css
 
 
-@app.route('/query/<user_query>')
-def page_for_query(user_query: str) -> str:
+@app.route('/query', methods=['POST'])
+def page_for_query() -> str:
     """
     Render in HTML a page with all notes that match user query
     containing AND and OR operators.
     """
-    user_query = user_query.replace('%20', ' ')
-    note_titles = find_all_relevant_notes(user_query)
-    content_with_css = page_for_list_of_titles(
-        note_titles, page_title=user_query
-    )
+    user_query = request.form['query']
+    default = "нейронные_сети AND (постановка_задачи OR байесовские_методы)"
+    user_query = user_query or default
+    try:
+        note_titles = find_all_relevant_notes(user_query)
+    except sqlite3.OperationalError:
+        content_with_css = render_template('invalid_query.html', **locals())
+    else:
+        content_with_css = page_for_list_of_titles(
+            note_titles, page_title=user_query
+        )
     return content_with_css
 
 

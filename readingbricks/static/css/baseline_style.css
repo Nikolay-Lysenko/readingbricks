@@ -20,6 +20,17 @@ h3, h4, p {
     text-align: justify;
     text-indent: 25px;
 }
+li, ol, ul {
+    text-align: justify;
+}
+input {
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 5%;
+}
+a:link {
+    color: gray;
+}
 
 /* Suppress indenting text relatively a list marker that is indented itself. */
 li > p {

@@ -1,4 +1,4 @@
-# Reading Bricks
+# ReadingBricks
 
 ## What is it?
 
@@ -18,33 +18,48 @@ Currently, there are a small number of notes and so there is no need in complica
 
 ## How to use it?
 
-There are two main interfaces that allow browsing notes efficiently:
-* Jupyter-based (now it is the recommended way, but it will be deprecated in the future),
-* Flask-based (it will be the recommended way in the future).
-
-#### Jupyter-based interface
-
-When the repository is cloned to your local machine, open the file named `supplementaries/counts_of_tags.tsv`. It contains tags and their frequencies in tab-separated format. Look through the file and choose the tags you are interested in. Suppose that they are 'tag1', 'tag2', and 'tag3'. To make a notebook with notes that are associated with at least one of these tags, run:
-```
-python supplementaries/search_in_jupyter_notes.py -e tag1 OR tag2 OR tag3
-```
-
-More complex filtering is supported too. You can write arbitrary logical expressions with AND and OR operators and parentheses:
-```
-python supplementaries/search_in_jupyter_notes.py -e \(tag1 OR tag2\) AND \(tag3 OR tag4\)
-```
-Do not forget to escape parentheses, because without escaping `bash` fails.
-
-After your query is run, look at the freshly created file named `notes_for_the_last_query.ipynb`. Enjoy reading!
+There are two interfaces that allow browsing notes efficiently:
+* Flask-based (it is the recommended way),
+* Jupyter-based (it will be deprecated in the future).
 
 #### Flask-based interface
 
-To use this interface, you need to create a virtual environment (or `conda` environment) with Python 3.6 and packages listed in `requirements.txt`. Activate this environment and run the following command:
+To use this interface, you need to clone the repository to your local machine and install `readingbricks` package. For example, you can do so by running these commands from a terminal:
 ```
-python run_flask_app.py
+cd /your/path/
+git clone https://github.com/Nikolay-Lysenko/readingbricks
+cd readingbricks
+conda create -n readingbricks_env python=3.6
+source activate readingbricks_env
+pip install -e .
 ```
 
-After local server is started, open your web browser and go to `127.0.0.1:5000`. The web interface is quite self-explanatory. Again, enjoy reading!
+Every time you want to start a Flask application, do the following:
+```
+source activate readingbricks_env
+python /your/path/readingbricks/run_flask_app.py
+```
+
+The last command launches a local server. After it is ready, open your web browser and go to `127.0.0.1:5000`.
+
+The web interface is quite self-explanatory. There are two elements at the index page:
+* search bar,
+* cloud of tags.
+
+You can look through the tag cloud and choose the tags you are interested in. If you are interested in a single tag, just push a button with it. However, if you need less trivial selection of notes, search bar should be used. Arbitrary logical expressions with AND and OR operators and parentheses are supported there. 
+
+Enjoy reading!
+
+#### Jupyter-based interface
+
+If you do not want to use the Flask app, open the file named `supplementaries/counts_of_tags.tsv`. It contains tags and their frequencies in tab-separated format. You can decide what to read based on it. To create a Jupyter notebook with notes that match a query `(tag1 OR tag2) AND (tag3 OR tag4)`, run:
+```
+cd /your/path/readingbricks/supplementaries
+python search_in_jupyter_notes.py -e \(tag1 OR tag2\) AND \(tag3 OR tag4\)
+```
+Do not forget to escape parentheses, because without escaping `bash` fails.
+
+After your query is run, look at the freshly created file named `notes_for_the_last_query.ipynb`. Again, enjoy reading!
 
 ## How to contribute?
 

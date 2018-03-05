@@ -1,0 +1,16 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>ReadingBricks - Проверьте запрос</title>
+        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/baseline_style.css') }}">
+    </head>
+    <body>
+        <nav><a href="{{ url_for('index') }}" class="button">На главную</a></nav>
+        <div>
+            <h2>Запрос не может быть обработан</h2>
+            <p>Введён следующий запрос:</p>
+            <p><span style="background-color: #f1ece8">{{ user_query }}</span></p>
+            <p>Проверьте синтаксис — разрешены только круглые скобки и операторы AND и OR. Также проверьте правильность написания меток: возможно, для какой-либо метки использован пробел вместо нижнего подчёркивания.</p>
+        <div>
+    </body>
+</html>

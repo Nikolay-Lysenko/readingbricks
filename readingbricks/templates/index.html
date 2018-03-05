@@ -5,6 +5,11 @@
         <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/baseline_style.css') }}">
     </head>
     <body>
+        <div id="search_bar">
+            <form action='/query' method='post'>
+                <input type='text' name="query" placeholder="нейронные_сети AND (постановка_задачи OR байесовские_методы)">
+            </form>
+        </div>
         <div id="tags_cloud">{{ tags_cloud }}</div>
     </body>
 </html>
