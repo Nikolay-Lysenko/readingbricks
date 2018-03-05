@@ -107,7 +107,7 @@ def replace_leaf_with_tmp_table(parsed_query: str, cur: sqlite3.Cursor) -> str:
 def find_all_relevant_notes(user_query: str) -> List[str]:
     """
     Return list of notes that match the query.
-    An example of a query that can be processed by these function:
+    An example of a query that can be processed by this function:
     "neural_networks AND (problem_setup OR bayesian_methods)"
     """
     parsed_query = infer_precedence(user_query)
