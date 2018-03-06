@@ -130,10 +130,13 @@ def page_for_query() -> str:
         note_titles = query_handler.find_all_relevant_notes(user_query)
     except sqlite3.OperationalError:
         content_with_css = render_template('invalid_query.html', **locals())
-    else:
+        return content_with_css
+    if len(note_titles) > 0:
         content_with_css = page_for_list_of_titles(
             note_titles, page_title=user_query
         )
+    else:
+        content_with_css = render_template('empty_result.html', **locals())
     return content_with_css
 
 
