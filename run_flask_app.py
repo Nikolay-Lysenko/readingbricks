@@ -6,12 +6,20 @@ This script launches Flask application locally.
 
 
 from readingbricks import app
-from readingbricks.db_control import create_or_refresh_db
-from readingbricks.markdown_notes_control import (
-    refresh_directory_with_markdown_notes
+from readingbricks.db_control import DatabaseCreator
+from readingbricks.markdown_notes_control import MarkdownDirectoryCreator
+from readingbricks.path_configuration import (
+    get_path_to_ipynb_notes, get_path_to_markdown_notes, get_path_to_db
 )
 
 
-create_or_refresh_db()
-refresh_directory_with_markdown_notes()
+ipynb_path = get_path_to_ipynb_notes()
+markdown_path = get_path_to_markdown_notes()
+db_path = get_path_to_db()
+
+md_creator = MarkdownDirectoryCreator(ipynb_path, markdown_path)
+md_creator.refresh_directory_with_markdown_notes()
+db_creator = DatabaseCreator(ipynb_path, db_path)
+db_creator.create_or_refresh_db()
+
 app.run(debug=True)

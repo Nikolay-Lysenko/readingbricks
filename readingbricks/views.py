@@ -12,7 +12,7 @@ import os
 import sqlite3
 import contextlib
 from functools import reduce
-from typing import Union, List, Tuple
+from typing import List, Tuple
 
 from flask import render_template, url_for, request
 from flask_misaka import Misaka
@@ -24,7 +24,7 @@ from readingbricks.path_configuration import (
     get_path_to_markdown_notes,
     get_path_to_db
 )
-from readingbricks.user_query_processing import find_all_relevant_notes
+from readingbricks.user_query_processing import LogicalQueriesHandler
 
 
 markdown_preprocessor = Misaka()
@@ -125,8 +125,9 @@ def page_for_query() -> str:
     user_query = request.form['query']
     default = "нейронные_сети AND (постановка_задачи OR байесовские_методы)"
     user_query = user_query or default
+    query_handler = LogicalQueriesHandler(get_path_to_db())
     try:
-        note_titles = find_all_relevant_notes(user_query)
+        note_titles = query_handler.find_all_relevant_notes(user_query)
     except sqlite3.OperationalError:
         content_with_css = render_template('invalid_query.html', **locals())
     else:
