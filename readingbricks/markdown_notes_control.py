@@ -69,10 +69,10 @@ class MarkdownDirectoryCreator:
             for line in content:
                 destination_file.write(line + '\n')
 
-    def refresh_directory_with_markdown_notes(self) -> type(None):
+    def create_or_update_directory_with_markdown_notes(self) -> type(None):
         """
-        Delete previous editions of notes in Markdown and replace them
-        with the ones based on the current state of files from
+        Delete previous editions of notes in Markdown if there are any
+        and create the ones based on the current state of files from
         directory with notes.
 
         :return:

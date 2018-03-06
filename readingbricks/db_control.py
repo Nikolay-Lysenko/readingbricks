@@ -96,7 +96,7 @@ class DatabaseCreator:
             with closing(conn.cursor()) as cur:
                 cur.execute('VACUUM')
 
-    def create_or_refresh_db(self) -> type(None):
+    def create_or_update_db(self) -> type(None):
         """
         Create SQLite database if it does not exist or update it else.
 

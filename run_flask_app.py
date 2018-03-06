@@ -18,8 +18,8 @@ markdown_path = get_path_to_markdown_notes()
 db_path = get_path_to_db()
 
 md_creator = MarkdownDirectoryCreator(ipynb_path, markdown_path)
-md_creator.refresh_directory_with_markdown_notes()
+md_creator.create_or_update_directory_with_markdown_notes()
 db_creator = DatabaseCreator(ipynb_path, db_path)
-db_creator.create_or_refresh_db()
+db_creator.create_or_update_db()
 
 app.run(debug=True)
