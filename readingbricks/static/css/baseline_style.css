@@ -49,8 +49,9 @@ li > p {
     margin: 4px 2px;
     cursor: pointer;
 }
+.button:link {
+    color: black;
+}
 #tags_cloud {
     text-align: center;
 }
-
-
