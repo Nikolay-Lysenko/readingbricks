@@ -12,7 +12,7 @@ branches:
   - develop
 
 script:
-  - pytest
+  - python -m pytest
 
 notifications:
   email:
