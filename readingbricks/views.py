@@ -19,11 +19,6 @@ from flask_misaka import Misaka
 from markupsafe import Markup
 
 from readingbricks import app
-from readingbricks.path_configuration import (
-    get_path_to_counts_of_tags,
-    get_path_to_markdown_notes,
-    get_path_to_db
-)
 from readingbricks.user_query_processing import LogicalQueriesHandler
 
 
@@ -38,7 +33,8 @@ def index() -> str:
     """
     lines_in_html = ['<h2>На данный момент доступны следующие метки:</h2>\n']
     tags_with_counts = []
-    with open(get_path_to_counts_of_tags(), 'r') as source_file:
+    path_to_counts_of_tags = app.config.get('path_to_counts_of_tags')
+    with open(path_to_counts_of_tags) as source_file:
         for line in source_file:
             tags_with_counts.append(line.split('\t'))
     home_url = url_for('index', _external=True)
@@ -60,7 +56,7 @@ def convert_note_from_markdown_to_html(note_title: str) -> Markup:
     Convert note stored as a Markdown file into `Markup` instance
     with HTML inside.
     """
-    dir_path = get_path_to_markdown_notes()
+    dir_path = app.config.get('path_to_markdown_notes')
     abs_requested_path = os.path.join(dir_path, f'{note_title}.md')
     if not os.path.isfile(abs_requested_path):
         return render_template('404.html')
@@ -103,8 +99,9 @@ def page_for_tag(tag: str) -> str:
     """
     Render in HTML a page with all notes that have the specified tag.
     """
+    path_to_db = app.config.get('path_to_db')
     try:
-        with contextlib.closing(sqlite3.connect(get_path_to_db())) as conn:
+        with contextlib.closing(sqlite3.connect(path_to_db)) as conn:
             with contextlib.closing(conn.cursor()) as cur:
                 cur.execute(f"SELECT note_title FROM {tag}")
                 query_result = cur.fetchall()
@@ -125,7 +122,8 @@ def page_for_query() -> str:
     user_query = request.form['query']
     default = "нейронные_сети AND (постановка_задачи OR байесовские_методы)"
     user_query = user_query or default
-    query_handler = LogicalQueriesHandler(get_path_to_db())
+    path_to_db = app.config.get('path_to_db')
+    query_handler = LogicalQueriesHandler(path_to_db)
     try:
         note_titles = query_handler.find_all_relevant_notes(user_query)
     except sqlite3.OperationalError:
