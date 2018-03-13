@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 """
 This module contains web pages for Flask application.
 
