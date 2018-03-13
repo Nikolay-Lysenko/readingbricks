@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/Nikolay-Lysenko/readingbricks.svg?branch=master)](https://travis-ci.org/Nikolay-Lysenko/readingbricks)
+[![codecov](https://codecov.io/gh/Nikolay-Lysenko/readingbricks/branch/master/graph/badge.svg)](https://codecov.io/gh/Nikolay-Lysenko/readingbricks)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ac3959677909d81cb271/maintainability)](https://codeclimate.com/github/Nikolay-Lysenko/readingbricks/maintainability)
 
 # ReadingBricks
 
