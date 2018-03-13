@@ -21,13 +21,13 @@ from readingbricks.ipynb_utils import extract_cells
 @contextmanager
 def open_transaction(conn: sqlite3.Connection):
     """
-    An analogue of `contextlib.closing` for `sqlite3.Connection`.
+    Open transaction to SQLite database within a context.
     """
     cur = conn.cursor()
     cur.execute('BEGIN TRANSACTION')
     try:
         yield cur
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         print(e)
         cur.execute('ROLLBACK')
     else:

@@ -1,0 +1,17 @@
+[run]
+branch = True
+source = readingbricks
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if .debug:
+    raise AssertionError
+    raise NotImplementedError
+    raise RuntimeError
+    raise AttributeError
+    raise ValueError
+    raise TypeError
+    if __name__ == .__main__.:
+    pass

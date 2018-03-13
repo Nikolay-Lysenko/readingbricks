@@ -5,6 +5,8 @@ python:
 
 install:
   - pip install .
+  - pip install codecov
+  - export PYTHONPATH="."  # No data is collected by `coverage` without this.
 
 branches:
   only:
@@ -12,7 +14,12 @@ branches:
   - develop
 
 script:
-  - python -m pytest
+  - COVERAGE_FILE=.coverage_p coverage run tests/test_pre_launch_utils.py
+  - COVERAGE_FILE=.coverage_v coverage run tests/test_views.py
+  - coverage combine .coverage_p .coverage_v
+
+after_success:
+  - codecov
 
 notifications:
   email:

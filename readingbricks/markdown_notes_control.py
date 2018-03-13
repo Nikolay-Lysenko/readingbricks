@@ -30,7 +30,7 @@ class MarkdownDirectoryCreator:
         self.__path_to_ipynb_notes = path_to_ipynb_notes
         self.__path_to_markdown_notes = path_to_markdown_notes
 
-    def __provide_empty_directory(self) -> type(None):
+    def __provide_empty_directory(self) -> type(None):  # pragma: no cover
         # Make directory for Markdown files if it does not exist
         # and delete all files from there if it is not empty.
         if not os.path.isdir(self.__path_to_markdown_notes):
