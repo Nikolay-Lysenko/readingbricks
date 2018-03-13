@@ -9,7 +9,7 @@ import os
 import sqlite3
 import contextlib
 from functools import reduce
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from flask import render_template, url_for, request
 from flask_misaka import Misaka
@@ -48,15 +48,16 @@ def index() -> str:
     return content_with_css
 
 
-def convert_note_from_markdown_to_html(note_title: str) -> Markup:
+def convert_note_from_markdown_to_html(note_title: str) -> Optional[Markup]:
     """
     Convert note stored as a Markdown file into `Markup` instance
     with HTML inside.
+    If requested note does not exist, return `None`.
     """
     dir_path = app.config.get('path_to_markdown_notes')
     abs_requested_path = os.path.join(dir_path, f'{note_title}.md')
     if not os.path.isfile(abs_requested_path):
-        return render_template('404.html')
+        return None
     with open(abs_requested_path, 'r') as source_file:
         content_in_markdown = ''.join(source_file.read())
     content_in_html = markdown_preprocessor.render(
@@ -72,6 +73,8 @@ def page_with_note(note_title: str) -> str:
     Render in HTML a page with exactly one note.
     """
     content_in_html = convert_note_from_markdown_to_html(note_title)
+    if content_in_html is None:
+        return render_template('404.html')
     title = note_title
     content_with_css = render_template('regular_page.html', **locals())
     content_with_css = content_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
