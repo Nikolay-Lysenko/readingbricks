@@ -5,7 +5,7 @@ python:
 
 install:
   - pip install .
-  - pip install codecov
+  - pip install pytest codecov pytest-cov
   - export PYTHONPATH="."  # No data is collected by `coverage` without this.
 
 branches:
@@ -14,9 +14,7 @@ branches:
   - develop
 
 script:
-  - COVERAGE_FILE=.coverage_p coverage run tests/test_pre_launch_utils.py
-  - COVERAGE_FILE=.coverage_v coverage run tests/test_views.py
-  - coverage combine .coverage_p .coverage_v
+  - python -m pytest --cov=readingbricks --cov-config .coveragerc
 
 after_success:
   - codecov
