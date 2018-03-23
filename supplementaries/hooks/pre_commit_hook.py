@@ -44,14 +44,16 @@ def validate_cell_header(
     """
     content = [line.rstrip('\n') for line in cell['source']]
     curr_header = content[0]
-    headers.append(curr_header)
 
     msg = f"Cell header must be h2 (i.e. start with ##), found: {curr_header}"
-    assert curr_header.startswith('## '), msg
+    if not curr_header.startswith('## '):
+        raise ValueError(msg)
 
     msg = f"Each header must appear only once, '{curr_header}' is duplicated"
-    assert len(headers) == len(set(headers)), msg
+    if curr_header in headers:
+        raise ValueError(msg)
 
+    headers.append(curr_header)
     return headers
 
 
