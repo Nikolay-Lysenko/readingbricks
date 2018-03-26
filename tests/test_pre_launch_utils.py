@@ -8,7 +8,7 @@ Tests of functions that are executed before every start of Flask app.
 import unittest
 import os
 
-from readingbricks.ipynb_utils import extract_cells
+from readingbricks import utils
 
 
 class TestJupyterCellsExtraction(unittest.TestCase):
@@ -25,7 +25,7 @@ class TestJupyterCellsExtraction(unittest.TestCase):
         """
         dir_path = os.path.dirname(__file__)
         path = os.path.join(dir_path, 'resources/sample_notebooks')
-        result = list(extract_cells(path))
+        result = list(utils.extract_cells(path))
         letters_content = sorted(
             [
                 cell['source']

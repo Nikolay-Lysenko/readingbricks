@@ -13,8 +13,9 @@ from typing import Set, Tuple
 from warnings import warn
 from copy import copy
 
-from readingbricks.ipynb_utils import extract_cells
-from readingbricks import get_path_to_ipynb_notes, get_path_to_counts_of_tags
+from readingbricks import (
+    utils, get_path_to_ipynb_notes, get_path_to_counts_of_tags
+)
 
 
 def parse_cli_args() -> argparse.Namespace:
@@ -107,7 +108,7 @@ def compose_notebook(template: str) -> type(None):
     """
     path_to_notes = get_path_to_ipynb_notes()
     relevant_cells = []
-    for cell in extract_cells(path_to_notes):
+    for cell in utils.extract_cells(path_to_notes):
         if eval(template.format(str(cell['metadata']['tags']))):
             relevant_cells.append(cell)
 

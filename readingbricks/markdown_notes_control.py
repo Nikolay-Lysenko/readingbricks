@@ -9,7 +9,7 @@ notes in Markdown into separate Markdown files used by Flask app.
 import os
 from typing import List, Dict, Any
 
-from readingbricks.ipynb_utils import extract_cells
+from readingbricks import utils
 
 
 class MarkdownDirectoryCreator:
@@ -61,7 +61,8 @@ class MarkdownDirectoryCreator:
         # specified directory.
         content = [line.rstrip('\n') for line in cell['source']]
         content = self.__insert_blank_line_before_each_list(content)
-        file_name = content[0].lstrip('## ')
+        note_title = content[0].lstrip('## ')
+        file_name = utils.compress(note_title)
         file_path = (
             os.path.join(self.__path_to_markdown_notes, file_name) + '.md'
         )
@@ -79,5 +80,5 @@ class MarkdownDirectoryCreator:
             None
         """
         self.__provide_empty_directory()
-        for cell in extract_cells(self.__path_to_ipynb_notes):
+        for cell in utils.extract_cells(self.__path_to_ipynb_notes):
             self.__copy_cell_content_to_markdown_file(cell)

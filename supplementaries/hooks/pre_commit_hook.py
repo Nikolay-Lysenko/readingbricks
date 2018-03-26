@@ -109,11 +109,11 @@ def main():
     sys.path.append(
         convert_to_absolute_path('../../readingbricks/')
     )
-    from ipynb_utils import extract_cells
+    import utils
 
     headers = []
     tags = []
-    for cell in extract_cells(absolute_paths['source']):
+    for cell in utils.extract_cells(absolute_paths['source']):
         headers = validate_cell_header(headers, cell)
         tags = update_list_of_tags(tags, cell)
     write_tag_counts(tags, absolute_paths['counts'])
