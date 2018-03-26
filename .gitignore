@@ -113,5 +113,5 @@ ENV/
 nohup.out
 
 # Output
-markdown_notes/
+.markdown_notes/
 notes_for_the_last_query.ipynb

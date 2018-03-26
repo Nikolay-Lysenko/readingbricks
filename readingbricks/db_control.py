@@ -15,7 +15,7 @@ from collections import defaultdict
 from typing import Dict, Any
 from contextlib import contextmanager, closing
 
-from readingbricks.ipynb_utils import extract_cells
+from readingbricks import utils
 
 
 @contextmanager
@@ -75,14 +75,14 @@ class DatabaseCreator:
             with open_transaction(conn) as cur:
                 for k, v in tag_to_notes.items():
                     cur.execute(
-                        f"CREATE TABLE IF NOT EXISTS {k} (note_title VARCHAR)"
+                        f"CREATE TABLE IF NOT EXISTS {k} (note_id VARCHAR)"
                     )
                     cur.execute(
                         f"""
                         CREATE UNIQUE INDEX IF NOT EXISTS
                             {k}_index
                         ON
-                            {k} (note_title)
+                            {k} (note_id)
                         """
                     )
                     cur.execute(
@@ -90,8 +90,8 @@ class DatabaseCreator:
                     )
                     for note_title in v:
                         cur.execute(
-                            f"INSERT INTO {k} (note_title) VALUES (?)",
-                            (note_title,)
+                            f"INSERT INTO {k} (note_id) VALUES (?)",
+                            (utils.compress(note_title),)
                         )
             with closing(conn.cursor()) as cur:
                 cur.execute('VACUUM')
@@ -104,7 +104,7 @@ class DatabaseCreator:
             None
         """
         tag_to_notes = defaultdict(lambda: [])
-        for cell in extract_cells(self.__path_to_ipynb_notes):
+        for cell in utils.extract_cells(self.__path_to_ipynb_notes):
             tag_to_notes = self.__update_mapping_of_tags_to_notes(
                 tag_to_notes, cell
             )

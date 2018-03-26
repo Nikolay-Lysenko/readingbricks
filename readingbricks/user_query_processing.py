@@ -64,7 +64,7 @@ class LogicalQueriesHandler:
             query = (
                 f"""
                 SELECT
-                    a.note_title
+                    a.note_id
                 FROM
                     {operands[0]} a
                 """
@@ -74,7 +74,7 @@ class LogicalQueriesHandler:
                         JOIN
                         {operand} {alias}
                         ON
-                            a.note_title = {alias}.note_title
+                            a.note_id = {alias}.note_id
                         """
                         for operand, alias in operands_and_aliases[1:]
                     ]
@@ -86,7 +86,7 @@ class LogicalQueriesHandler:
                     [
                         f"""
                         SELECT
-                            note_title
+                            note_id
                         FROM
                             {operand}
                         """
@@ -101,7 +101,7 @@ class LogicalQueriesHandler:
         cur.execute(
             f"""
             CREATE UNIQUE INDEX IF NOT EXISTS
-                {tmp_table_name}_index ON {tmp_table_name} (note_title)
+                {tmp_table_name}_index ON {tmp_table_name} (note_id)
             """
         )
         return f"'{tmp_table_name}'"
@@ -142,7 +142,7 @@ class LogicalQueriesHandler:
                         parsed_query, cur
                     )
                 tmp_table_name = parsed_query.strip("'")
-                cur.execute(f"SELECT note_title FROM {tmp_table_name}")
+                cur.execute(f"SELECT note_id FROM {tmp_table_name}")
                 query_result = cur.fetchall()
-                note_titles = [x[0] for x in query_result]
-        return note_titles
+                note_ids = [x[0] for x in query_result]
+        return note_ids

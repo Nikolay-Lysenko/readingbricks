@@ -15,7 +15,7 @@ from flask import render_template, url_for, request
 from flask_misaka import Misaka
 from markupsafe import Markup
 
-from readingbricks import app
+from readingbricks import app, utils
 from readingbricks.user_query_processing import LogicalQueriesHandler
 
 
@@ -48,14 +48,14 @@ def index() -> str:
     return content_with_css
 
 
-def convert_note_from_markdown_to_html(note_title: str) -> Optional[Markup]:
+def convert_note_from_markdown_to_html(note_id: str) -> Optional[Markup]:
     """
     Convert note stored as a Markdown file into `Markup` instance
     with HTML inside.
     If requested note does not exist, return `None`.
     """
     dir_path = app.config.get('path_to_markdown_notes')
-    abs_requested_path = os.path.join(dir_path, f'{note_title}.md')
+    abs_requested_path = os.path.join(dir_path, f'{note_id}.md')
     if not os.path.isfile(abs_requested_path):
         return None
     with open(abs_requested_path, 'r') as source_file:
@@ -72,7 +72,8 @@ def page_with_note(note_title: str) -> str:
     """
     Render in HTML a page with exactly one note.
     """
-    content_in_html = convert_note_from_markdown_to_html(note_title)
+    note_id = utils.compress(note_title)
+    content_in_html = convert_note_from_markdown_to_html(note_id)
     if content_in_html is None:
         return render_template('404.html')
     title = note_title
@@ -81,13 +82,13 @@ def page_with_note(note_title: str) -> str:
     return content_with_css
 
 
-def page_for_list_of_titles(note_titles: List[str], page_title: str) -> str:
+def page_for_list_of_ids(note_ids: List[str], page_title: str) -> str:
     """
     Render in HTML a page with all notes from the specified list.
     """
     notes_content = []
-    for note_title in note_titles:
-        notes_content.append(convert_note_from_markdown_to_html(note_title))
+    for note_id in note_ids:
+        notes_content.append(convert_note_from_markdown_to_html(note_id))
     content_in_html = reduce(lambda x, y: x + y, notes_content)
     content_with_css = render_template('regular_page.html', **locals())
     content_with_css = content_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
@@ -103,13 +104,13 @@ def page_for_tag(tag: str) -> str:
     try:
         with contextlib.closing(sqlite3.connect(path_to_db)) as conn:
             with contextlib.closing(conn.cursor()) as cur:
-                cur.execute(f"SELECT note_title FROM {tag}")
+                cur.execute(f"SELECT note_id FROM {tag}")
                 query_result = cur.fetchall()
-        note_titles = [x[0] for x in query_result]
+        note_ids = [x[0] for x in query_result]
     except sqlite3.OperationalError:
         return render_template('404.html')
     page_title = tag.capitalize().replace('_', ' ')
-    content_with_css = page_for_list_of_titles(note_titles, page_title)
+    content_with_css = page_for_list_of_ids(note_ids, page_title)
     return content_with_css
 
 
@@ -125,13 +126,13 @@ def page_for_query() -> str:
     path_to_db = app.config.get('path_to_db')
     query_handler = LogicalQueriesHandler(path_to_db)
     try:
-        note_titles = query_handler.find_all_relevant_notes(user_query)
+        note_ids = query_handler.find_all_relevant_notes(user_query)
     except sqlite3.OperationalError:
         content_with_css = render_template('invalid_query.html', **locals())
         return content_with_css
-    if len(note_titles) > 0:
-        content_with_css = page_for_list_of_titles(
-            note_titles, page_title=user_query
+    if len(note_ids) > 0:
+        content_with_css = page_for_list_of_ids(
+            note_ids, page_title=user_query
         )
     else:
         content_with_css = render_template('empty_result.html', **locals())

@@ -28,7 +28,7 @@ def get_path_to_markdown_notes() -> str:
     Get absolute path to directory with automatically created
     Markdown files with notes.
     """
-    path = os.path.join(os.path.dirname(__file__), 'markdown_notes')
+    path = os.path.join(os.path.dirname(__file__), '.markdown_notes')
     return path
 
 
