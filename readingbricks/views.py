@@ -109,7 +109,7 @@ def page_for_tag(tag: str) -> str:
         note_ids = [x[0] for x in query_result]
     except sqlite3.OperationalError:
         return render_template('404.html')
-    page_title = tag.capitalize().replace('_', ' ')
+    page_title = (tag[0].upper() + tag[1:]).replace('_', ' ')
     content_with_css = page_for_list_of_ids(note_ids, page_title)
     return content_with_css
 
