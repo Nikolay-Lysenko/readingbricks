@@ -18,8 +18,8 @@ class TestViews(unittest.TestCase):
     Tests of functions for rendering pages in HTML.
     """
 
-    @staticmethod
-    def setUpClass() -> type(None):
+    @classmethod
+    def setUpClass(cls) -> type(None):
         """
         Do preparations that must be done once before all tests.
         """
