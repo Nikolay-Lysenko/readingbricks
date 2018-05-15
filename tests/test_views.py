@@ -17,6 +17,9 @@ class TestViews(unittest.TestCase):
     """
     Tests of functions for rendering pages in HTML.
     """
+    title_template = (
+        '<h2><a href="http://localhost/notes/{title}">{title}</a></h2>'
+    )
 
     @classmethod
     def setUpClass(cls) -> type(None):
@@ -27,7 +30,7 @@ class TestViews(unittest.TestCase):
 
         dir_path = os.path.dirname(__file__)
         ipynb_path = os.path.join(dir_path, 'resources/sample_notebooks')
-        markdown_path = os.path.join(dir_path, 'markdown_notes')
+        markdown_path = os.path.join(dir_path, '.markdown_notes')
         db_path = os.path.join(dir_path, 'tag_to_notes.db')
         counts_path = os.path.join(dir_path, 'resources/counts_of_tags.tsv')
 
@@ -74,7 +77,7 @@ class TestViews(unittest.TestCase):
         self.assertTrue('C:' in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
         self.assertTrue('<li><p>\\(c\\)</p></li>' in result)
-        self.assertFalse('<h2>A</h2>' in result)
+        self.assertFalse(self.title_template.format(title='A') in result)
         result = self.app.get('/notes/non_existing').data.decode('utf-8')
         self.assertTrue('Страница не найдена.' in result)
 
@@ -83,12 +86,12 @@ class TestViews(unittest.TestCase):
         Test page with all notes tagged with a specified tag.
         """
         result = self.app.get('/tags/digits').data.decode('utf-8')
-        self.assertTrue('<h2>1</h2>' in result)
-        self.assertFalse('<h2>A</h2>' in result)
+        self.assertTrue(self.title_template.format(title='1') in result)
+        self.assertFalse(self.title_template.format(title='A') in result)
 
         result = self.app.get('/tags/list').data.decode('utf-8')
-        self.assertTrue('<h2>C</h2>' in result)
-        self.assertFalse('<h2>A</h2>' in result)
+        self.assertTrue(self.title_template.format(title='C') in result)
+        self.assertFalse(self.title_template.format(title='A') in result)
 
         result = self.app.get('/tags/non_existing').data.decode('utf-8')
         self.assertTrue('Страница не найдена.' in result)
@@ -104,7 +107,7 @@ class TestViews(unittest.TestCase):
         self.assertTrue('C:' in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
         self.assertTrue('<li><p>\\(c\\)</p></li>' in result)
-        self.assertFalse('<h2>1</h2>' in result)
+        self.assertFalse(self.title_template.format(title='1') in result)
 
         query = 'list AND digits'
         response = self.app.post('/query', data={'query': query})
@@ -119,15 +122,15 @@ class TestViews(unittest.TestCase):
         query = 'list OR letters'
         response = self.app.post('/query', data={'query': query})
         result = response.data.decode('utf-8')
-        self.assertTrue('<h2>A</h2>' in result)
-        self.assertFalse('<h2>1</h2>' in result)
+        self.assertTrue(self.title_template.format(title='A') in result)
+        self.assertFalse(self.title_template.format(title='1') in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
 
         query = 'list OR digits'
         response = self.app.post('/query', data={'query': query})
         result = response.data.decode('utf-8')
-        self.assertFalse('<h2>A</h2>' in result)
-        self.assertTrue('<h2>1</h2>' in result)
+        self.assertFalse(self.title_template.format(title='A') in result)
+        self.assertTrue(self.title_template.format(title='1') in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
 
     def test_page_for_complex_query(self) -> type(None):
@@ -138,18 +141,18 @@ class TestViews(unittest.TestCase):
         query = '(list AND letters) OR (digits AND letters)'
         response = self.app.post('/query', data={'query': query})
         result = response.data.decode('utf-8')
-        self.assertTrue('<h2>C</h2>' in result)
+        self.assertTrue(self.title_template.format(title='C') in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
-        self.assertFalse('<h2>B</h2>' in result)
-        self.assertFalse('<h2>1</h2>' in result)
+        self.assertFalse(self.title_template.format(title='B') in result)
+        self.assertFalse(self.title_template.format(title='1') in result)
 
         query = '(list AND letters) AND ((digits OR letters OR list) OR list)'
         response = self.app.post('/query', data={'query': query})
         result = response.data.decode('utf-8')
-        self.assertTrue('<h2>C</h2>' in result)
+        self.assertTrue(self.title_template.format(title='C') in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
-        self.assertFalse('<h2>B</h2>' in result)
-        self.assertFalse('<h2>1</h2>' in result)
+        self.assertFalse(self.title_template.format(title='B') in result)
+        self.assertFalse(self.title_template.format(title='1') in result)
 
         query = '(list AND letters) AND ((digits OR letters OR list) OR lists)'
         response = self.app.post('/query', data={'query': query})
