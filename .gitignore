@@ -101,17 +101,18 @@ ENV/
 # mypy
 .mypy_cache/
 
-# SQLite databases
-*.db
-
 # Other editors
 *~
 .idea/
 .save
 
+# Binaries
+*.db
+*.sqlite3
+
 # Logs
 nohup.out
 
-# Output
+# Project-specific files
 .markdown_notes/
 notes_for_the_last_query.ipynb
