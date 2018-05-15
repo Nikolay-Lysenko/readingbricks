@@ -1,5 +1,5 @@
 """
-This module contains web pages for Flask application.
+This module renders web pages for Flask application.
 
 @author: Nikolay Lysenko
 """
