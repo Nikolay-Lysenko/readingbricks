@@ -1,3 +1,4 @@
+/* Base settings. */
 body {
     background-color: #fffbf4;
 }
@@ -28,8 +29,17 @@ input {
     max-width: 1000px;
     margin-top: 5%;
 }
+
+/* Links styling. */
 a:link {
     color: gray;
+}
+a:visited {
+    color: #696969
+}
+h2 a:link, h2 a:visited {
+    color: black;
+    text-decoration: none;
 }
 
 /* Suppress indenting text relatively a list marker that is indented itself. */
@@ -37,6 +47,7 @@ li > p {
     text-indent: 0px;
 }
 
+/* Cloud of tags. */
 .button {
     background-color: #f1ece8;
     border: none;
@@ -49,7 +60,7 @@ li > p {
     margin: 4px 2px;
     cursor: pointer;
 }
-.button:link {
+.button:link, .button:visited {
     color: black;
 }
 #tags_cloud {

@@ -46,6 +46,17 @@ def index() -> str:
     return content_with_css
 
 
+def make_link_from_title(md_title: str) -> str:
+    """
+    Convert title in Markdown according to the following pattern:
+    '## Title' -> '## [Title](URL)'
+    """
+    note_title = md_title.lstrip('# ').rstrip('\n')
+    home_url = url_for('index', _external=True)
+    result = '## ' + f'[{note_title}]({home_url}notes/{note_title})\n'
+    return result
+
+
 def convert_note_from_markdown_to_html(note_id: str) -> Optional[Markup]:
     """
     Convert note stored as a Markdown file into `Markup` instance
@@ -57,7 +68,9 @@ def convert_note_from_markdown_to_html(note_id: str) -> Optional[Markup]:
     if not os.path.isfile(abs_requested_path):
         return None
     with open(abs_requested_path, 'r') as source_file:
-        content_in_markdown = ''.join(source_file.read())
+        md_title = source_file.readline()
+        md_title_as_link = make_link_from_title(md_title)
+        content_in_markdown = md_title_as_link + source_file.read()
     content_in_html = markdown_preprocessor.render(
         content_in_markdown,
         math=True, math_explicit=True, no_intra_emphasis=True
