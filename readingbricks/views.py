@@ -28,7 +28,6 @@ def index() -> str:
     """
     Render home page.
     """
-    lines_in_html = ['<h2>На данный момент доступны следующие метки:</h2>\n']
     tags_with_counts = []
     path_to_counts_of_tags = app.config.get('path_to_counts_of_tags')
     with open(path_to_counts_of_tags) as source_file:
@@ -42,8 +41,7 @@ def index() -> str:
         f'<a href={home_url}tags/{tag} class="button">{name}</a>\n'
         for (tag, counts), name in zip(tags_with_counts, link_names)
     ]
-    lines_in_html.extend(links_to_tags)
-    tags_cloud = Markup(''.join(lines_in_html))
+    tags_cloud = Markup(''.join(links_to_tags))
     content_with_css = render_template('index.html', **locals())
     return content_with_css
 

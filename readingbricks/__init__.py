@@ -58,4 +58,4 @@ app.config['path_to_db'] = get_path_to_db()
 app.config['path_to_counts_of_tags'] = get_path_to_counts_of_tags()
 
 
-import readingbricks.views  # Flask requires import it after `app` is set.
+import readingbricks.views  # Flask requires to import it after `app` is set.
