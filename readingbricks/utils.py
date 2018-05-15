@@ -10,6 +10,9 @@ import json
 import hashlib
 from typing import Dict, Generator, Any
 
+# Note that there must be no dependencies other than Python built-ins,
+# because this module is imported by scripts from `supplementaries`.
+
 
 def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     """
@@ -48,4 +51,3 @@ def compress(string: str, max_length: int = 64) -> str:
     hashed_string = hashlib.sha256(string.encode('utf-8')).hexdigest()
     result = hashed_string[:max_length]
     return result
-
