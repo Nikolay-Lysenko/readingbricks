@@ -13,7 +13,9 @@
         <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/baseline_style.css') }}">
     </head>
     <body>
-        <nav><a href="{{ url_for('index') }}" class="button">На главную</a></nav>
-        <div id="regular">{{ content_in_html }}</div>
+        <nav id="mainpage"><a href="{{ url_for('index') }}" class="button">На главную</a></nav>
+        <div id="central">
+            <div id="content">{{ content_in_html }}</div>
+        </div>
     </body>
 </html>

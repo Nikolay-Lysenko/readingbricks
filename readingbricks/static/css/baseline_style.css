@@ -1,18 +1,4 @@
-/* Base settings. */
-body {
-    background-color: #fffbf4;
-}
-nav {
-    position: fixed;
-    top: 2.5%;
-    left: 2.5%;
-    width: 10%;
-}
-div {
-    margin: auto;
-    width: 70%;
-    max-width: 1000px;
-}
+/* Base elements */
 h1, h2 {
     text-align: center;
     margin-top: 5%;
@@ -26,8 +12,6 @@ li, ol, ul {
 }
 input {
     width: 100%;
-    max-width: 1000px;
-    margin-top: 5%;
 }
 
 /* Links styling. */
@@ -47,9 +31,44 @@ li > p {
     text-indent: 0px;
 }
 
-/* Cloud of tags. */
+/* Custom divisions */
+#mainpage {
+    position: fixed;
+    top: 2.5%;
+    left: 2.5%;
+    width: 10%;
+}
+#central {
+    background-color: #f9f9f9;
+    margin: auto;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    width: 75%;
+    text-align:center;
+}
+#content {
+    margin: auto;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    width: 95%;
+    max-width: 1000px;
+}
+#search_bar {
+    margin: auto;
+    padding-top: 5%;
+    width: 95%;
+    max-width: 1000px;
+}
+#tags_cloud {
+    margin: auto;
+    text-align: center;
+    padding-bottom: 5%;
+    width: 95%;
+}
+
+/* Buttons */
 .button {
-    background-color: #f1ece8;
+    background-color: #f7f7fc;
     border: none;
     color: black;
     padding: 15px 32px;
@@ -62,7 +81,4 @@ li > p {
 }
 .button:link, .button:visited {
     color: black;
-}
-#tags_cloud {
-    text-align: center;
 }
