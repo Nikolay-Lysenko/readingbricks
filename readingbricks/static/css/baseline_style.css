@@ -1,4 +1,7 @@
 /* Base elements */
+body {
+    text-align: center;
+}
 h1, h2 {
     text-align: center;
     margin-top: 5%;
@@ -37,6 +40,7 @@ li > p {
     top: 2.5%;
     left: 2.5%;
     width: 10%;
+    text-align: left;
 }
 #central {
     background-color: #f9f9f9;
