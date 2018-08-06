@@ -57,6 +57,19 @@ def make_link_from_title(md_title: str) -> str:
     return result
 
 
+def activate_cross_links(content_in_markdown: str) -> str:
+    """
+    Make links to other notes valid.
+    Substring __home_url__ is reserved for links to the root of the
+    web app and here this substring is replaced with actual URL.
+    """
+    home_url = url_for('index', _external=True)
+    content_in_markdown = content_in_markdown.replace(
+        '__home_url__/', home_url
+    )
+    return content_in_markdown
+
+
 def convert_note_from_markdown_to_html(note_id: str) -> Optional[Markup]:
     """
     Convert note stored as a Markdown file into `Markup` instance
@@ -71,6 +84,7 @@ def convert_note_from_markdown_to_html(note_id: str) -> Optional[Markup]:
         md_title = source_file.readline()
         md_title_as_link = make_link_from_title(md_title)
         content_in_markdown = md_title_as_link + source_file.read()
+    content_in_markdown = activate_cross_links(content_in_markdown)
     content_in_html = markdown_preprocessor.render(
         content_in_markdown,
         math=True, math_explicit=True, no_intra_emphasis=True

@@ -24,7 +24,7 @@ Currently, there are a small number of notes and so there is no need in complica
 
 There are two interfaces that allow browsing notes efficiently:
 * Flask-based (it is the recommended way),
-* Jupyter-based (it will be deprecated in the future).
+* Jupyter-based (it will be deprecated in the future; links to other notes are not supported).
 
 #### Flask-based interface
 
