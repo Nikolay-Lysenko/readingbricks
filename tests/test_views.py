@@ -61,7 +61,7 @@ class TestViews(unittest.TestCase):
 
     def test_default_page(self) -> type(None):
         """
-        Test page that is shown when page is not found.
+        Test page that is shown when requested page is not found.
         """
         response = self.app.get('/non_existing')
         result = response.data.decode('utf-8')
@@ -77,6 +77,8 @@ class TestViews(unittest.TestCase):
         self.assertTrue('C:' in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
         self.assertTrue('<li><p>\\(c\\)</p></li>' in result)
+        html_link = '<a href="http://localhost/notes/B">link</a>'
+        self.assertTrue(html_link in result)
         self.assertFalse(self.title_template.format(title='A') in result)
         result = self.app.get('/notes/non_existing').data.decode('utf-8')
         self.assertTrue('Страница не найдена.' in result)

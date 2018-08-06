@@ -36,7 +36,10 @@ class TestJupyterCellsExtraction(unittest.TestCase):
         true_letters_content = [
             ['## A\n', '\n', 'A'],
             ['## B\n', '\n', 'B'],
-            ['## C\n', '\n', 'C:\n', '* c\n', '* _c_\n', '* $c$'],
+            [
+                '## C\n', '\n', 'C:\n', '* c\n', '* _c_\n', '* $c$\n', '\n',
+                '[link](__home_url__/notes/B)'
+            ],
             ['## D\n', '\n', 'D']
         ]
         self.assertEqual(letters_content, true_letters_content)
