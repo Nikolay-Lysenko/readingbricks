@@ -20,8 +20,8 @@ class LogicalQueriesHandler:
     statements, interacts with a database, and returns list of
     matching notes.
 
-    Valid query can involve only tags, binary logical operators
-    (i.e., AND and OR), parentheses, and spaces.
+    Valid query can involve only tags, logical operators
+    (i.e., AND, OR, and NOT), parentheses, and spaces.
     An example of a query that can be processed by this class:
     "neural_networks AND (problem_setup OR bayesian_methods)".
     Response to this query is a list of all notes tagged with
@@ -38,13 +38,13 @@ class LogicalQueriesHandler:
 
     @staticmethod
     def __infer_precedence(user_query: str) -> str:
-        # Put square brackets that indicates precedence of operations.
+        # Put square brackets that indicate precedence of operations.
         extra_chars = pp.srange(r"[\0x80-\0x7FF]")  # Support Cyrillic letters.
         tag = pp.Word(pp.alphas + '_' + extra_chars)
         parser = pp.operatorPrecedence(
             tag,
             [
-                ("NOT", 1, pp.opAssoc.RIGHT),  # Not supported further.
+                ("NOT", 1, pp.opAssoc.RIGHT),
                 ("AND", 2, pp.opAssoc.LEFT),
                 ("OR", 2, pp.opAssoc.LEFT)
             ]
@@ -53,29 +53,25 @@ class LogicalQueriesHandler:
         return str(parsed_expression)
 
     @staticmethod
-    def __create_tmp_table(leaf: List[str], cur: sqlite3.Cursor) -> str:
-        # Create temporary table for a single leaf.
-        # Here, leaf means a part of the query with no nested parts in it
-        # and a part means something that is inside square brackets.
-        operator = leaf[1]
-        operands = leaf[::2]
+    def __compose_sql_query(operator: str, operands: List[str]) -> str:
+        # Turn logical operation into SQL query that performs it.
         if operator == 'AND':
             operands_and_aliases = list(zip(operands, string.ascii_lowercase))
             query = (
-                f"""
+                f'''
                 SELECT
                     a.note_id
                 FROM
                     {operands[0]} a
-                """
+                '''
                 + '\n'.join(
                     [
-                        f"""
+                        f'''
                         JOIN
                         {operand} {alias}
                         ON
                             a.note_id = {alias}.note_id
-                        """
+                        '''
                         for operand, alias in operands_and_aliases[1:]
                     ]
                 )
@@ -84,25 +80,57 @@ class LogicalQueriesHandler:
             query = (
                 "UNION".join(
                     [
-                        f"""
+                        f'''
                         SELECT
                             note_id
                         FROM
                             {operand}
-                        """
+                        '''
                         for operand in operands
                     ]
                 )
             )
+        elif operator == 'NOT':
+            query = (
+                f'''
+                SELECT
+                    *
+                FROM
+                    all_notes a
+                WHERE
+                    NOT EXISTS(
+                        SELECT
+                            *
+                        FROM
+                            {operands[0]} b
+                        WHERE
+                            a.note_id = b.note_id
+                    )
+                '''
+            )
         else:
             raise ValueError(f"Unknown operator: {operator}")
+        return query
+
+    def __create_tmp_table(self, leaf: List[str], cur: sqlite3.Cursor) -> str:
+        # Create temporary table for a single leaf.
+        # Here, leaf means a part of the parsed user query without any
+        # nested parts in it and a part means anything that is inside
+        # square brackets.
+        if 'NOT' in leaf:
+            operator = 'NOT'
+            operands = [leaf[1]]
+        else:
+            operator = leaf[1]
+            operands = leaf[::2]
+        query = self.__compose_sql_query(operator, operands)
         tmp_table_name = '_'.join(leaf)
         cur.execute(f"CREATE TEMP TABLE {tmp_table_name} AS {query}")
         cur.execute(
-            f"""
+            f'''
             CREATE UNIQUE INDEX IF NOT EXISTS
                 {tmp_table_name}_index ON {tmp_table_name} (note_id)
-            """
+            '''
         )
         return f"'{tmp_table_name}'"
 
@@ -128,11 +156,11 @@ class LogicalQueriesHandler:
         Return list of notes that match the query.
 
         :param user_query:
-            expression with tags as operands, AND and OR operators,
-            and parentheses. For example:
+            expression with AND, OR, and NOT operators,
+            tags as operands, and parentheses. For example:
             "neural_networks AND (problem_setup OR bayesian_methods)"
         :return:
-            list of matching notes
+            IDs of matching notes
         """
         parsed_query = self.__infer_precedence(user_query)
         with contextlib.closing(sqlite3.connect(self.__path_to_db)) as conn:

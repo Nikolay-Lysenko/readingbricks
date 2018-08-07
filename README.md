@@ -24,7 +24,7 @@ Currently, there are a small number of notes and so there is no need in complica
 
 There are two interfaces that allow browsing notes efficiently:
 * Flask-based (it is the recommended way),
-* Jupyter-based (it will be deprecated in the future; links to other notes are not supported).
+* Jupyter-based (it is deprecated; its functionality is reduced).
 
 #### Flask-based interface
 
@@ -50,7 +50,7 @@ The web interface is quite self-explanatory. There are two elements at the index
 * search bar,
 * cloud of tags.
 
-You can look through the tag cloud and choose the tags you are interested in. If you are interested in a single tag, just push a button with it. However, if you need less trivial selection of notes, search bar should be used. Arbitrary logical expressions with AND and OR operators and parentheses are supported there. 
+You can look through the tag cloud and choose the tags you are interested in. If you are interested in a single tag, just push a button with it. However, if you need less trivial selection of notes, search bar should be used. Arbitrary logical expressions with AND, OR, and NOT operators and parentheses are supported there. 
 
 Enjoy reading!
 

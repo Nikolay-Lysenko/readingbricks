@@ -61,7 +61,7 @@ class DatabaseCreator:
         # Store cell header in lists that relates to its tags.
         cell_header = cell['source'][0].rstrip('\n')
         cell_header = cell_header.lstrip('## ')
-        cell_tags = cell['metadata']['tags']
+        cell_tags = cell['metadata']['tags'] + ['all_notes']
         for tag in cell_tags:
             tag_to_notes[tag].append(cell_header)
         return tag_to_notes

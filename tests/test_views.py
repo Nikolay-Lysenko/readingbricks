@@ -100,8 +100,8 @@ class TestViews(unittest.TestCase):
 
     def test_page_for_query_with_and(self) -> type(None):
         """
-        Test POST requests made from a search bar of home page
-        with AND operator.
+        Test POST requests with AND operator made from a search bar
+        of the home page.
         """
         query = 'list AND letters'
         response = self.app.post('/query', data={'query': query})
@@ -118,8 +118,8 @@ class TestViews(unittest.TestCase):
 
     def test_page_for_query_with_or(self) -> type(None):
         """
-        Test POST requests made from a search bar of home page
-        with OR operator.
+        Test POST requests with OR operator made from a search bar
+        of the home page.
         """
         query = 'list OR letters'
         response = self.app.post('/query', data={'query': query})
@@ -134,6 +134,25 @@ class TestViews(unittest.TestCase):
         self.assertFalse(self.title_template.format(title='A') in result)
         self.assertTrue(self.title_template.format(title='1') in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
+
+    def test_page_for_query_with_not(self) -> type(None):
+        """
+        Test POST requests with NOT operator made from a search bar
+        of the home page.
+        """
+        query = 'NOT list'
+        response = self.app.post('/query', data={'query': query})
+        result = response.data.decode('utf-8')
+        self.assertTrue(self.title_template.format(title='A') in result)
+        self.assertFalse(self.title_template.format(title='C') in result)
+        self.assertTrue('<p>1</p>' in result)
+
+        query = 'NOT letters'
+        response = self.app.post('/query', data={'query': query})
+        result = response.data.decode('utf-8')
+        self.assertFalse(self.title_template.format(title='A') in result)
+        self.assertTrue(self.title_template.format(title='1') in result)
+        self.assertTrue('<p>2</p>' in result)
 
     def test_page_for_complex_query(self) -> type(None):
         """
@@ -155,6 +174,14 @@ class TestViews(unittest.TestCase):
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
         self.assertFalse(self.title_template.format(title='B') in result)
         self.assertFalse(self.title_template.format(title='1') in result)
+
+        query = 'digits OR NOT (letters AND NOT list)'
+        response = self.app.post('/query', data={'query': query})
+        result = response.data.decode('utf-8')
+        self.assertTrue(self.title_template.format(title='1') in result)
+        self.assertTrue('<li><p><em>c</em></p></li>' in result)
+        self.assertFalse(self.title_template.format(title='A') in result)
+        self.assertFalse(self.title_template.format(title='D') in result)
 
         query = '(list AND letters) AND ((digits OR letters OR list) OR lists)'
         response = self.app.post('/query', data={'query': query})
