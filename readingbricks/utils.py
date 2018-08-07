@@ -22,7 +22,7 @@ def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     :param path_to_dir:
         path to source directory
     :yield:
-        cells as a dictionaries
+        cells as dictionaries
     """
     file_names = [
         x for x in os.listdir(path_to_dir)
@@ -39,14 +39,15 @@ def compress(string: str, max_length: int = 64) -> str:
     """
     Compress string to a string of restricted length.
     The function can be useful, because some filesystems and/or
-    disk encryption impose restriction on maximum length of filename.
+    disk encryption tools impose restriction on maximum length of
+    a filename.
 
     :param string:
         string to be compressed
     :param max_length:
         maximum length of output, default is 64
     :return:
-        compressed string
+        compressed string which is a truncated hash of input string
     """
     hashed_string = hashlib.sha256(string.encode('utf-8')).hexdigest()
     result = hashed_string[:max_length]
