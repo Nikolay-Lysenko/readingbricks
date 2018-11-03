@@ -2,7 +2,7 @@
 This module contains utilities for parsing user queries
 and for selecting matching notes.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

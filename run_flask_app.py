@@ -1,7 +1,7 @@
 """
 This script launches Flask application locally.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

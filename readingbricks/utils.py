@@ -1,7 +1,7 @@
 """
 It is just a small module for auxiliary tools.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

@@ -1,7 +1,7 @@
 """
 Tests of functions that render HTML pages.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

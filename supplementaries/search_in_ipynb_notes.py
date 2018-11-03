@@ -2,7 +2,7 @@
 This script makes a notebook with notes that must be selected
 according to user query.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

@@ -1,7 +1,7 @@
 """
 This is the script that initializes Flask app.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

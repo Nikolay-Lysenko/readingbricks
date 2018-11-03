@@ -15,7 +15,7 @@ As of now, the list of covered tasks consists of these element:
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

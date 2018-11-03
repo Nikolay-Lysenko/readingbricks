@@ -1,7 +1,7 @@
 """
 Just a regular `setup.py` file.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

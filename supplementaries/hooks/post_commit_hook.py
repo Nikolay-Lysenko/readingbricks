@@ -9,7 +9,7 @@ automatically managed files.
 The script is called after every commit automatically if its copy
 is placed and named correctly.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

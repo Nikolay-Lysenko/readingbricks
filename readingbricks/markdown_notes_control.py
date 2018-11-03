@@ -2,7 +2,7 @@
 This script provides tools for turning Jupyter notebook cells with
 notes in Markdown into separate Markdown files used by Flask app.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

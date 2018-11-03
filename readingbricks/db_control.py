@@ -6,7 +6,7 @@ practice to store binary files in a Git repository and so
 the file managed by the script differs from files managed by
 pre-commit hook.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 
