@@ -1,0 +1,5 @@
+Flask==0.12.2
+Flask-Markdown==0.3
+Flask-Misaka==0.4.1
+pyparsing==2.2.0
+python-markdown-math==0.3

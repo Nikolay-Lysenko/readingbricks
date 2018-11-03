@@ -33,15 +33,16 @@ To use this interface, you need to clone the repository to your local machine an
 cd /your/path/
 git clone https://github.com/Nikolay-Lysenko/readingbricks
 cd readingbricks
-conda create -n readingbricks_env python=3.6
-source activate readingbricks_env
+virtualenv --python=python3.6 venv
+source venv/bin/activate
 pip install -e .
 ```
 
 Every time you want to start a Flask application, do the following:
 ```
-source activate readingbricks_env
-python /your/path/readingbricks/run_flask_app.py
+cd /your/path/readingbricks
+source venv/bin/activate
+python run_flask_app.py
 ```
 
 The last command launches a local server. After it is ready, open your web browser and go to `127.0.0.1:5000`.
