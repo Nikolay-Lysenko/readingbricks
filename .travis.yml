@@ -5,7 +5,6 @@ python:
 
 install:
   - make venv
-  - export PYTHONPATH="."  # No data is collected by `coverage` without this.
 
 branches:
   only:
