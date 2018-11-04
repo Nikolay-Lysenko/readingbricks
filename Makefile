@@ -7,6 +7,7 @@ help:
 	@echo "lint - check code style with flake8"
 	@echo "test - run tests with pytest"
 	@echo "coverage - run tests with pytest and report test coverage"
+	@echo "codecov - invoke codecov (should be used only within CI pipeline)"
 
 clean:
 	@rm -rf venv
