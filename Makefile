@@ -28,3 +28,6 @@ test: venv
 
 coverage: test
 	. venv/bin/activate; coverage report -m; coverage html
+
+codecov:
+	. venv/bin/activate; codecov

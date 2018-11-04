@@ -16,7 +16,7 @@ script:
   - make test
 
 after_success:
-  - codecov
+  - make codecov
 
 notifications:
   email:
