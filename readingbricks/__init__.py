@@ -58,4 +58,7 @@ app.config['path_to_db'] = get_path_to_db()
 app.config['path_to_counts_of_tags'] = get_path_to_counts_of_tags()
 
 
-import readingbricks.views  # Flask requires to import it after `app` is set.
+# Flask requires to import `views` after `app` is set
+# in order to decorate views and register routes.
+# Thus, E402 and F401 style violations should be ignored here.
+import readingbricks.views  # noqa: E402, F401
