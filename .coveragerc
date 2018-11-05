@@ -1,6 +1,8 @@
 [run]
 branch = True
 source = readingbricks
+omit =
+    readingbricks/app_for_server.py
 
 [report]
 exclude_lines =
