@@ -57,17 +57,16 @@ def validate_cell_header(
     return headers
 
 
-def validate_tags(tags: List[str]) -> type(None):
+def validate_tag(tag: str) -> type(None):
     """
-    Check that every tag can be a name of SQLite table.
+    Check that a tag can be a name of SQLite table.
     """
-    for tag in tags:
-        if not tag:
-            raise ValueError("Empty tags are not allowed")
-        if '-' in tag:
-            raise ValueError("Symbol '-' is prohibited in a tag name")
-        if tag[0].isdigit():
-            raise ValueError("Tags must not start with digit")
+    if not tag:
+        raise ValueError("Empty tags are not allowed")
+    if '-' in tag:
+        raise ValueError("Symbol '-' is prohibited in a tag name")
+    if tag[0].isdigit():
+        raise ValueError("Tags must not start with digit")
 
 
 def update_list_of_tags(tags: List[str], cell: Dict[str, Any]) -> List[str]:
@@ -75,7 +74,8 @@ def update_list_of_tags(tags: List[str], cell: Dict[str, Any]) -> List[str]:
     Update list of tags occurrences based on a current cell.
     """
     current_tags = cell['metadata']['tags']
-    validate_tags(current_tags)
+    for tag in current_tags:
+        validate_tag(tag)
     tags.extend(current_tags)
     return tags
 
