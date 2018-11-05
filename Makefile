@@ -1,4 +1,4 @@
-.PHONY: help clean lint test coverage
+.PHONY: help clean lint test coverage resources
 
 .DEFAULT: help
 help:
@@ -8,6 +8,7 @@ help:
 	@echo "test - run tests with pytest"
 	@echo "coverage - run tests with pytest and report test coverage"
 	@echo "codecov - invoke codecov (should be used only within CI pipeline)"
+	@echo "resources - prepare resources for Flask launch with uwsgi server"
 
 clean:
 	@rm -rf venv
@@ -32,3 +33,6 @@ coverage: test
 
 codecov:
 	. venv/bin/activate; codecov
+
+resources:
+	. venv/bin/activate; python readingbricks/resources.py
