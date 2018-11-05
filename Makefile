@@ -2,7 +2,7 @@
 
 .DEFAULT: help
 help:
-	@echo "clean - delete virtual environment and build artifacts"
+	@echo "clean - delete virtual environment and artifacts of builds"
 	@echo "venv - create virtual environment and install the package there"
 	@echo "lint - check code style with flake8"
 	@echo "test - run tests with pytest"
