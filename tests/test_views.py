@@ -1,7 +1,7 @@
 """
 Tests of functions that render HTML pages.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 
@@ -9,8 +9,7 @@ import unittest
 import os
 
 from readingbricks import app
-from readingbricks.db_control import DatabaseCreator
-from readingbricks.markdown_notes_control import MarkdownDirectoryCreator
+from readingbricks.resources import provide_resources
 
 
 class TestViews(unittest.TestCase):
@@ -34,10 +33,7 @@ class TestViews(unittest.TestCase):
         db_path = os.path.join(dir_path, 'tag_to_notes.db')
         counts_path = os.path.join(dir_path, 'resources/counts_of_tags.tsv')
 
-        md_creator = MarkdownDirectoryCreator(ipynb_path, markdown_path)
-        md_creator.create_or_update_directory_with_markdown_notes()
-        db_creator = DatabaseCreator(ipynb_path, db_path)
-        db_creator.create_or_update_db()
+        provide_resources(ipynb_path, markdown_path, db_path)
 
         app.config['path_to_ipynb_notes'] = ipynb_path
         app.config['path_to_markdown_notes'] = markdown_path

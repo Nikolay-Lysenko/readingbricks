@@ -1,7 +1,7 @@
 """
 This module renders web pages for Flask application.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

@@ -1,7 +1,7 @@
 """
 Tests of functions that are executed before every start of Flask app.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 

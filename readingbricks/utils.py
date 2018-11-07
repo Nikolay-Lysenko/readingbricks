@@ -1,13 +1,15 @@
 """
 It is just a small module for auxiliary tools.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 
 import os
 import json
+import sqlite3
 import hashlib
+from contextlib import contextmanager
 from typing import Dict, Generator, Any
 
 # Note that there must be no dependencies other than Python built-ins,
@@ -52,3 +54,21 @@ def compress(string: str, max_length: int = 64) -> str:
     hashed_string = hashlib.sha256(string.encode('utf-8')).hexdigest()
     result = hashed_string[:max_length]
     return result
+
+
+@contextmanager
+def open_transaction(conn: sqlite3.Connection):
+    """
+    Open transaction to SQLite database within a context.
+    """
+    cur = conn.cursor()
+    cur.execute('BEGIN TRANSACTION')
+    try:
+        yield cur
+    except Exception as e:  # pragma: no cover
+        print(e)
+        cur.execute('ROLLBACK')
+    else:
+        cur.execute('COMMIT')
+    finally:
+        cur.close()

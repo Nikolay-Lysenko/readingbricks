@@ -1,7 +1,7 @@
 """
 Just a regular `setup.py` file.
 
-@author: Nikolay Lysenko
+Author: Nikolay Lysenko
 """
 
 
@@ -16,8 +16,8 @@ with open(os.path.join(current_dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='readingbricks',
-    version='0.1a',
-    description='Flask app for searching through tagged notes in ipynb cells',
+    version='0.1.0',
+    description='Flask app for searching through tagged Jupyter cells',
     long_description=long_description,
     url='https://github.com/Nikolay-Lysenko/readingbricks',
     author='Nikolay Lysenko',
@@ -28,6 +28,7 @@ setup(
     include_package_data=True,  # For CSS files and so on.
     python_requires='>=3.6',
     install_requires=[
-        'Flask', 'Flask-Markdown', 'Flask-Misaka', 'pyparsing'
+        'Flask', 'Flask-Markdown', 'Flask-Misaka',
+        'pyparsing', 'python-markdown-math'
     ]
 )

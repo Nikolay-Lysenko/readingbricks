@@ -4,9 +4,7 @@ python:
   - "3.6"
 
 install:
-  - pip install .
-  - pip install pytest codecov pytest-cov
-  - export PYTHONPATH="."  # No data is collected by `coverage` without this.
+  - make venv
 
 branches:
   only:
@@ -14,10 +12,10 @@ branches:
   - develop
 
 script:
-  - python -m pytest --cov=readingbricks --cov-config .coveragerc
+  - make test
 
 after_success:
-  - codecov
+  - make codecov
 
 notifications:
   email:
