@@ -22,13 +22,7 @@ Currently, there are a small number of notes and so there is no need in complica
 
 ## How to use it?
 
-There are two interfaces that allow browsing notes efficiently:
-* Flask-based (it is the recommended way),
-* Jupyter-based (it is deprecated; its functionality is reduced).
-
-#### Flask-based interface
-
-To use this interface, you need to clone the repository to your local machine and install `readingbricks` package. For example, you can do so by running these commands from a terminal:
+The search system has Flask-based interface. To use this interface, you need to clone the repository to your local machine and install `readingbricks` package. For example, you can do so by running these commands from a terminal:
 ```
 cd /your/path/
 git clone https://github.com/Nikolay-Lysenko/readingbricks
@@ -53,22 +47,11 @@ You can look through the tag cloud and choose the tags you are interested in. If
 
 Enjoy reading!
 
-#### Jupyter-based interface
-
-If you do not want to use the Flask app, open the file named `supplementaries/counts_of_tags.tsv`. It contains tags and their frequencies in tab-separated format. You can decide what to read based on it. To create a Jupyter notebook with notes that match a query `(tag1 OR tag2) AND (tag3 OR tag4)`, run:
-```
-cd /your/path/readingbricks/supplementaries
-python search_in_jupyter_notes.py -e \(tag1 OR tag2\) AND \(tag3 OR tag4\)
-```
-Do not forget to escape parentheses, because without escaping `bash` fails.
-
-After your query is run, look at the freshly created file named `notes_for_the_last_query.ipynb`. Again, enjoy reading!
-
 ## How to contribute?
 
 Everyone can create a pull request.
 
-Note that it is strongly recommended to update counts of tags automatically. This is easy — just copy and rename files from `supplementaries/hooks` directory according to instructions that are placed inside of them right below shebang. If it is done correctly, Git hooks will refresh tag statistics and other necessary files for you. Also they will validate your notes.
+Note that it is strongly recommended to update counts of tags automatically. This is easy — just copy and rename files from `supplementaries/hooks` directory according to instructions that are placed inside of them right below shebang. If it is done correctly, Git hooks will refresh tag statistics and other necessary files for you. Also they will validate your notes and check code style.
 
 When working on a pull request, keep in mind internal structure of the project. It is assumed that there are three types of files:
 * Notes written by humans. All of them must be inside `notes` directory in `ipynb` format;
@@ -76,5 +59,4 @@ When working on a pull request, keep in mind internal structure of the project. 
 * Infrastructure code. It can be stored at these locations:
     - `readingbricks` (Flask-based interface),
     - `supplementaries/hooks` (Git hooks),
-    - `supplementaries/search_in_jupyter_notes.py` (the only file for Jupyter-based interface),
     - `tests` (tests for continuous integration).
