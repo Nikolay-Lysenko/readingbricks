@@ -18,11 +18,10 @@ from typing import Dict, Generator, Any
 
 def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     """
-    Walk through the specified directory and yield cells of
-    Jupyter notebooks from there.
+    Walk through directory and yield cells of notebooks from there.
 
     :param path_to_dir:
-        path to source directory
+        path to source directory with Jupyter notebooks
     :yield:
         cells as dictionaries
     """
@@ -39,7 +38,8 @@ def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
 
 def compress(string: str, max_length: int = 64) -> str:
     """
-    Compress string to a string of restricted length.
+    Compress a string to a string of restricted length.
+
     The function can be useful, because some filesystems and/or
     disk encryption tools impose restriction on maximum length of
     a filename.
@@ -57,10 +57,10 @@ def compress(string: str, max_length: int = 64) -> str:
 
 
 @contextmanager
-def open_transaction(conn: sqlite3.Connection):
-    """
-    Open transaction to SQLite database within a context.
-    """
+def open_transaction(
+        conn: sqlite3.Connection
+) -> Generator[sqlite3.Cursor, None, None]:
+    """Open transaction to SQLite database within a context."""
     cur = conn.cursor()
     cur.execute('BEGIN TRANSACTION')
     try:

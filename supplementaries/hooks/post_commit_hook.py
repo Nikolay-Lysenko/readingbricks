@@ -4,8 +4,8 @@
 
 
 """
-This script adds to the current commit refreshed versions of
-automatically managed files.
+This script commits the latest versions of automatically managed files.
+
 The script is called after every commit automatically if its copy
 is placed and named correctly.
 
@@ -18,15 +18,18 @@ import subprocess
 
 
 def main():
-    # Pre-commit hook has added files to the next commit.
-    # Add them to the current one.
+    """
+    Add to the current commit files that were added to the next commit.
 
+    Note that these files must be added beforehand by pre-commit hook.
+    """
     # Break infinite recursion with disabling post-commit hooks.
     subprocess.run(
         '[ -x {file} ] && chmod -x {file}'.format(file=__file__),
         shell=True
     )
 
+    # Edit current commit.
     relative_path = '../../'
     script_directory = os.path.dirname(__file__)
     absolute_path = os.path.join(script_directory, relative_path)

@@ -1,5 +1,5 @@
 """
-Tests of functions that are executed before every start of Flask app.
+Tests of auxiliary functions.
 
 Author: Nikolay Lysenko
 """
@@ -12,17 +12,10 @@ from readingbricks import utils
 
 
 class TestJupyterCellsExtraction(unittest.TestCase):
-    """
-    Tests of tools for iterating over Jupyter cells.
-    """
+    """Tests of tools for iterating over Jupyter cells."""
 
-    def test_extract_cells(self):
-        """
-        Test `extract_cells` function.
-
-        :return:
-             None
-        """
+    def test_extract_cells(self) -> None:
+        """Test `extract_cells` function."""
         dir_path = os.path.dirname(__file__)
         path = os.path.join(dir_path, 'resources/sample_notebooks')
         result = list(utils.extract_cells(path))
@@ -58,6 +51,7 @@ class TestJupyterCellsExtraction(unittest.TestCase):
 
 
 def main():
+    """Run tests."""
     test_loader = unittest.TestLoader()
     suites_list = []
     testers = [

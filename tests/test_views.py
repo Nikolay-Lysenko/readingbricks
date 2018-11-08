@@ -13,18 +13,15 @@ from readingbricks.resources import provide_resources
 
 
 class TestViews(unittest.TestCase):
-    """
-    Tests of functions for rendering pages in HTML.
-    """
+    """Tests of functions for rendering pages in HTML."""
+
     title_template = (
         '<h2><a href="http://localhost/notes/{title}">{title}</a></h2>'
     )
 
     @classmethod
-    def setUpClass(cls) -> type(None):
-        """
-        Do preparations that must be done once before all tests.
-        """
+    def setUpClass(cls) -> None:
+        """Do preparations that must be done once before all tests."""
         app.testing = True
 
         dir_path = os.path.dirname(__file__)
@@ -40,35 +37,27 @@ class TestViews(unittest.TestCase):
         app.config['path_to_db'] = db_path
         app.config['path_to_counts_of_tags'] = counts_path
 
-    def setUp(self) -> type(None):
-        """
-        Do preparations that must be done before each test.
-        """
+    def setUp(self) -> None:
+        """Do preparations that must be done before each test."""
         self.app = app.test_client()
 
-    def test_home_page(self) -> type(None):
-        """
-        Test home page.
-        """
+    def test_home_page(self) -> None:
+        """Test home page."""
         result = self.app.get('/').data.decode('utf-8')
         self.assertTrue('letters (4)' in result)
         self.assertTrue('digits (2)' in result)
         self.assertTrue('list (1)' in result)
 
-    def test_default_page(self) -> type(None):
-        """
-        Test page that is shown when requested page is not found.
-        """
+    def test_default_page(self) -> None:
+        """Test page that is shown when requested page is not found."""
         response = self.app.get('/non_existing')
         result = response.data.decode('utf-8')
         status_code = response.status_code
         self.assertTrue('<title>Страница не найдена</title>' in result)
         self.assertEqual(status_code, 404)
 
-    def test_page_for_note(self) -> type(None):
-        """
-        Test page with a single note.
-        """
+    def test_page_for_note(self) -> None:
+        """Test page with a single note."""
         result = self.app.get('/notes/C').data.decode('utf-8')
         self.assertTrue('C:' in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
@@ -79,10 +68,8 @@ class TestViews(unittest.TestCase):
         result = self.app.get('/notes/non_existing').data.decode('utf-8')
         self.assertTrue('Страница не найдена.' in result)
 
-    def test_page_for_tag(self) -> type(None):
-        """
-        Test page with all notes tagged with a specified tag.
-        """
+    def test_page_for_tag(self) -> None:
+        """Test page with all notes tagged with a specified tag."""
         result = self.app.get('/tags/digits').data.decode('utf-8')
         self.assertTrue(self.title_template.format(title='1') in result)
         self.assertFalse(self.title_template.format(title='A') in result)
@@ -94,11 +81,8 @@ class TestViews(unittest.TestCase):
         result = self.app.get('/tags/non_existing').data.decode('utf-8')
         self.assertTrue('Страница не найдена.' in result)
 
-    def test_page_for_query_with_and(self) -> type(None):
-        """
-        Test POST requests with AND operator made from a search bar
-        of the home page.
-        """
+    def test_page_for_query_with_and(self) -> None:
+        """Test search bar requests with AND operator."""
         query = 'list AND letters'
         response = self.app.post('/query', data={'query': query})
         result = response.data.decode('utf-8')
@@ -112,11 +96,8 @@ class TestViews(unittest.TestCase):
         result = response.data.decode('utf-8')
         self.assertTrue('h2>Ничего не найдено</h2>' in result)
 
-    def test_page_for_query_with_or(self) -> type(None):
-        """
-        Test POST requests with OR operator made from a search bar
-        of the home page.
-        """
+    def test_page_for_query_with_or(self) -> None:
+        """Test search bar requests with OR operator."""
         query = 'list OR letters'
         response = self.app.post('/query', data={'query': query})
         result = response.data.decode('utf-8')
@@ -131,11 +112,8 @@ class TestViews(unittest.TestCase):
         self.assertTrue(self.title_template.format(title='1') in result)
         self.assertTrue('<li><p><em>c</em></p></li>' in result)
 
-    def test_page_for_query_with_not(self) -> type(None):
-        """
-        Test POST requests with NOT operator made from a search bar
-        of the home page.
-        """
+    def test_page_for_query_with_not(self) -> None:
+        """Test search bar requests with NOT operator."""
         query = 'NOT list'
         response = self.app.post('/query', data={'query': query})
         result = response.data.decode('utf-8')
@@ -150,11 +128,8 @@ class TestViews(unittest.TestCase):
         self.assertTrue(self.title_template.format(title='1') in result)
         self.assertTrue('<p>2</p>' in result)
 
-    def test_page_for_complex_query(self) -> type(None):
-        """
-        Test POST requests made from a search bar of home page
-        with both AND and OR operators.
-        """
+    def test_page_for_complex_query(self) -> None:
+        """Test search bar requests with NOT, AND, and OR operators."""
         query = '(list AND letters) OR (digits AND letters)'
         response = self.app.post('/query', data={'query': query})
         result = response.data.decode('utf-8')
@@ -186,6 +161,7 @@ class TestViews(unittest.TestCase):
 
 
 def main():
+    """Run tests."""
     test_loader = unittest.TestLoader()
     suites_list = []
     testers = [

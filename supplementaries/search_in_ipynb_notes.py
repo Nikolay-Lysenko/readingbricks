@@ -1,6 +1,5 @@
 """
-This script makes a notebook with notes that must be selected
-according to user query.
+This script creates a notebook with notes that match a user query.
 
 Author: Nikolay Lysenko
 """
@@ -13,9 +12,7 @@ from typing import Set, Tuple
 from warnings import warn
 from copy import copy
 
-from readingbricks import (
-    utils, get_path_to_ipynb_notes, get_path_to_counts_of_tags
-)
+from readingbricks import utils, settings
 
 
 def parse_cli_args() -> argparse.Namespace:
@@ -75,7 +72,7 @@ def parse_expression(expression: str) -> Tuple[str, Set[str]]:
 
 def validate_and_preprocess_cli_args(
         cli_args: argparse.Namespace
-        ) -> argparse.Namespace:
+) -> argparse.Namespace:
     """
     Inform user about potential mistakes and preprocess input.
 
@@ -85,7 +82,7 @@ def validate_and_preprocess_cli_args(
         namespace with preprocessed arguments
     """
     valid_tags = []
-    with open(get_path_to_counts_of_tags(), 'r') as tags_file:
+    with open(settings.get_path_to_counts_of_tags(), 'r') as tags_file:
         for line in tags_file:
             valid_tags.append(line.split('\t')[0])
     template, tags = parse_expression(cli_args.expression)
@@ -96,7 +93,7 @@ def validate_and_preprocess_cli_args(
     return cli_args
 
 
-def compose_notebook(template: str) -> type(None):
+def compose_notebook(template: str) -> None:
     """
     Create notebook with relevant notes only.
 
@@ -106,7 +103,7 @@ def compose_notebook(template: str) -> type(None):
     :return:
         None
     """
-    path_to_notes = get_path_to_ipynb_notes()
+    path_to_notes = settings.get_path_to_ipynb_notes()
     relevant_cells = []
     for cell in utils.extract_cells(path_to_notes):
         if eval(template.format(str(cell['metadata']['tags']))):
@@ -127,6 +124,7 @@ def compose_notebook(template: str) -> type(None):
 
 
 def main():
+    """Create notebook with requested notes."""
     cli_args = parse_cli_args()
     cli_args = validate_and_preprocess_cli_args(cli_args)
     compose_notebook(cli_args.template)
