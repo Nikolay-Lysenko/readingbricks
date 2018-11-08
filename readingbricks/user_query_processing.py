@@ -1,6 +1,5 @@
 """
-This module contains utilities for parsing user queries
-and for selecting matching notes.
+This module parses user queries and selects matching notes.
 
 Author: Nikolay Lysenko
 """
@@ -16,9 +15,11 @@ import pyparsing as pp
 
 class LogicalQueriesHandler:
     """
-    A class that converts query of a special form into SQL
-    statements, interacts with a database, and returns list of
-    matching notes.
+    Processor of queries that returns list of matching notes.
+
+    A query of a special form is converted to SQL statement,
+    database interaction starts, and list of matching notes
+    is returned as a result.
 
     Valid query can involve only tags, logical operators
     (i.e., AND, OR, and NOT), parentheses, and spaces.
@@ -34,6 +35,7 @@ class LogicalQueriesHandler:
     """
 
     def __init__(self, path_to_db: str):
+        """Initialize an instance."""
         self.__path_to_db = path_to_db
 
     @staticmethod
@@ -138,7 +140,7 @@ class LogicalQueriesHandler:
             self,
             parsed_query: str,
             cur: sqlite3.Cursor
-            ) -> str:
+    ) -> str:
         # Create a temporary table for a single leaf and return a query
         # where this leaf is replaced with the name of the temporary table.
         parts = parsed_query.split(']')

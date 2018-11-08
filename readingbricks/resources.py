@@ -23,9 +23,10 @@ from readingbricks import utils, settings
 
 class DatabaseCreator:
     """
-    Instances of this class can create SQLite database where tables
-    represent tags and rows of a table represent notes tagged with
-    the corresponding tag.
+    Creator of SQLite database mapping a tag to a list of notes.
+
+    Namely, tables from the database represent tags and rows of a table
+    represent notes tagged with the corresponding tag.
 
     :param path_to_ipynb_notes:
         path to directory where Jupyter files with notes are located
@@ -35,6 +36,7 @@ class DatabaseCreator:
     """
 
     def __init__(self, path_to_ipynb_notes: str, path_to_db: str):
+        """Initialize an instance."""
         self.__path_to_ipynb_notes = path_to_ipynb_notes
         self.__path_to_db = path_to_db
 
@@ -42,7 +44,7 @@ class DatabaseCreator:
     def __update_mapping_of_tags_to_notes(
             tag_to_notes: defaultdict,
             cell: Dict[str, Any]
-            ) -> defaultdict:
+    ) -> defaultdict:
         # Store cell header in lists that relates to its tags.
         cell_header = cell['source'][0].rstrip('\n')
         cell_header = cell_header.lstrip('## ')
@@ -54,7 +56,7 @@ class DatabaseCreator:
     def __write_tag_to_notes_mapping_to_db(
             self,
             tag_to_notes: defaultdict
-            ) -> type(None):
+    ) -> None:
         # Write content of `tag_to_notes` to the target DB.
         with closing(sqlite3.connect(self.__path_to_db)) as conn:
             with utils.open_transaction(conn) as cur:
@@ -81,7 +83,7 @@ class DatabaseCreator:
             with closing(conn.cursor()) as cur:
                 cur.execute('VACUUM')
 
-    def create_or_update_db(self) -> type(None):
+    def create_or_update_db(self) -> None:
         """
         Create SQLite database if it does not exist or update it else.
 
@@ -98,10 +100,12 @@ class DatabaseCreator:
 
 class MarkdownDirectoryCreator:
     """
-    Instances of this class can parse notes in Jupyter format, convert
-    notes content to Markdown, and store each note in a separate file
-    within a specified directory. Also instances of the class can
-    remove files that correspond to removed or renamed notes.
+    Converter of notes in Jupyter format to Markdown.
+
+    Each note is stored in a separate file within
+    a specified directory.
+    Also instances of the class can remove files that correspond to
+    removed or renamed notes.
 
     :param path_to_ipynb_notes:
         path to directory where Jupyter files with notes are located
@@ -111,10 +115,11 @@ class MarkdownDirectoryCreator:
     """
 
     def __init__(self, path_to_ipynb_notes: str, path_to_markdown_notes: str):
+        """Initialize an instance."""
         self.__path_to_ipynb_notes = path_to_ipynb_notes
         self.__path_to_markdown_notes = path_to_markdown_notes
 
-    def __provide_empty_directory(self) -> type(None):  # pragma: no cover
+    def __provide_empty_directory(self) -> None:  # pragma: no cover
         # Make directory for Markdown files if it does not exist
         # and delete all files from there if it is not empty.
         if not os.path.isdir(self.__path_to_markdown_notes):
@@ -140,7 +145,7 @@ class MarkdownDirectoryCreator:
     def __copy_cell_content_to_markdown_file(
             self,
             cell: Dict[str, Any],
-            ) -> type(None):
+    ) -> None:
         # Extract content of cell and save it as Markdown file in the
         # specified directory.
         content = [line.rstrip('\n') for line in cell['source']]
@@ -154,10 +159,12 @@ class MarkdownDirectoryCreator:
             for line in content:
                 destination_file.write(line + '\n')
 
-    def create_or_update_directory_with_markdown_notes(self) -> type(None):
+    def create_or_update_directory_with_markdown_notes(self) -> None:
         """
+        Manage directory with Markdown notes.
+
         Delete previous editions of notes in Markdown if there are any
-        and create the ones based on the current state of files from
+        and create the ones based on the current editions of files from
         directory with notes.
 
         :return:

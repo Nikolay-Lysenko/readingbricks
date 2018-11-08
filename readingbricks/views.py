@@ -25,9 +25,7 @@ markdown_preprocessor.init_app(app)
 
 @app.route('/')
 def index() -> str:
-    """
-    Render home page.
-    """
+    """Render home page."""
     tags_with_counts = []
     path_to_counts_of_tags = app.config.get('path_to_counts_of_tags')
     with open(path_to_counts_of_tags) as source_file:
@@ -48,7 +46,9 @@ def index() -> str:
 
 def make_link_from_title(md_title: str) -> str:
     """
-    Convert title in Markdown according to the following pattern:
+    Convert Markdown title to Markdown title with link.
+
+    The process can be illustrated in the following way:
     '## Title' -> '## [Title](URL)'
     """
     note_title = md_title.lstrip('# ').rstrip('\n')
@@ -60,7 +60,8 @@ def make_link_from_title(md_title: str) -> str:
 def activate_cross_links(content_in_markdown: str) -> str:
     """
     Make links to other notes valid.
-    Substring __home_url__ is reserved for links to the root of the
+
+    Substring '__home_url__' is reserved for links to the root of the
     web app and here this substring is replaced with actual URL.
     """
     home_url = url_for('index', _external=True)
@@ -72,8 +73,8 @@ def activate_cross_links(content_in_markdown: str) -> str:
 
 def convert_note_from_markdown_to_html(note_id: str) -> Optional[Markup]:
     """
-    Convert note stored as a Markdown file into `Markup` instance
-    with HTML inside.
+    Convert a Markdown file into `Markup` instance with HTML inside.
+
     If requested note does not exist, return `None`.
     """
     dir_path = app.config.get('path_to_markdown_notes')
@@ -94,9 +95,7 @@ def convert_note_from_markdown_to_html(note_id: str) -> Optional[Markup]:
 
 @app.route('/notes/<note_title>')
 def page_with_note(note_title: str) -> str:
-    """
-    Render in HTML a page with exactly one note.
-    """
+    """Render in HTML a page with exactly one note."""
     note_id = utils.compress(note_title)
     content_in_html = convert_note_from_markdown_to_html(note_id)
     if content_in_html is None:
@@ -108,9 +107,7 @@ def page_with_note(note_title: str) -> str:
 
 
 def page_for_list_of_ids(note_ids: List[str], page_title: str) -> str:
-    """
-    Render in HTML a page with all notes from the specified list.
-    """
+    """Render in HTML a page with all notes from the specified list."""
     notes_content = []
     for note_id in note_ids:
         notes_content.append(convert_note_from_markdown_to_html(note_id))
@@ -122,9 +119,7 @@ def page_for_list_of_ids(note_ids: List[str], page_title: str) -> str:
 
 @app.route('/tags/<tag>')
 def page_for_tag(tag: str) -> str:
-    """
-    Render in HTML a page with all notes that have the specified tag.
-    """
+    """Render in HTML a page with all notes that have the specified tag."""
     path_to_db = app.config.get('path_to_db')
     try:
         with contextlib.closing(sqlite3.connect(path_to_db)) as conn:
@@ -142,8 +137,9 @@ def page_for_tag(tag: str) -> str:
 @app.route('/query', methods=['POST'])
 def page_for_query() -> str:
     """
-    Render in HTML a page with all notes that match user query
-    containing AND and OR operators.
+    Render in HTML a page with all notes that match user query.
+
+    A query may contain AND, OR, and NOT operators.
     """
     user_query = request.form['query']
     default = "нейронные_сети AND (постановка_задачи OR байесовские_методы)"
@@ -166,4 +162,5 @@ def page_for_query() -> str:
 
 @app.errorhandler(404)
 def page_not_found(_) -> Tuple[str, int]:
+    """Render template for unknown page."""
     return render_template('404.html'), 404

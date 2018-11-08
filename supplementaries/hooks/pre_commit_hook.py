@@ -4,14 +4,16 @@
 
 
 """
-This script does tasks that are needed for update of both Flask
-and Jupyter interfaces of the project. Generally speaking, not all
-tasks should be done here, because it is desired to have no
-dependencies other than built-in Python packages in Git hooks.
+This script automates update-related tasks.
+
+Generally speaking, not all tasks should be done here, because
+it is desired to have no dependencies other than built-in Python packages
+in Git hooks.
 As of now, the list of covered tasks consists of these element:
-1) Update a file with counts of tags that appear at least once
+1) Check code style with 'lint' target from `Makefile`;
+2) Update a file with counts of tags that appear at least once
    in the most recent editions of notes;
-2) Validate human-written notes.
+3) Validate human-written notes.
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
@@ -27,21 +29,26 @@ from typing import List, Dict, Any
 
 
 def convert_to_absolute_path(relative_path: str) -> str:
-    """
-    Convert relative path to absolute path.
-    """
+    """Convert relative path to absolute path."""
     script_directory = os.path.dirname(__file__)
     absolute_path = os.path.join(script_directory, relative_path)
     return absolute_path
 
 
+def lint() -> None:
+    """Analyze code statically."""
+    rel_path_to_repo_root = '../../'
+    abs_path_to_repo_root = convert_to_absolute_path(rel_path_to_repo_root)
+    result = subprocess.run('make lint', cwd=abs_path_to_repo_root, shell=True)
+    return_code = result.returncode
+    if return_code:
+        raise ValueError('Lint target failed.')
+
+
 def validate_cell_header(
         headers: List[str], cell: Dict[str, Any]
-        ) -> List[str]:
-    """
-    Assert that header of cell is in accordance with assumptions
-    lying behind the project and update list of cell headers.
-    """
+) -> List[str]:
+    """Check that header of a cell meets project specifications."""
     content = [line.rstrip('\n') for line in cell['source']]
     curr_header = content[0]
 
@@ -57,10 +64,8 @@ def validate_cell_header(
     return headers
 
 
-def validate_tag(tag: str) -> type(None):
-    """
-    Check that a tag can be a name of SQLite table.
-    """
+def validate_tag(tag: str) -> None:
+    """Check that a tag can be a name of SQLite table."""
     if not tag:
         raise ValueError("Empty tags are not allowed")
     if '-' in tag:
@@ -70,9 +75,7 @@ def validate_tag(tag: str) -> type(None):
 
 
 def update_list_of_tags(tags: List[str], cell: Dict[str, Any]) -> List[str]:
-    """
-    Update list of tags occurrences based on a current cell.
-    """
+    """Update list of tags occurrences based on a current cell."""
     current_tags = cell['metadata']['tags']
     for tag in current_tags:
         validate_tag(tag)
@@ -80,11 +83,8 @@ def update_list_of_tags(tags: List[str], cell: Dict[str, Any]) -> List[str]:
     return tags
 
 
-def write_tag_counts(tags: List[str], absolute_path: str) -> type(None):
-    """
-    Overwrite previous content of the file where statistics are stored.
-    Namely, replace old content with data that are based on `tags`.
-    """
+def write_tag_counts(tags: List[str], absolute_path: str) -> None:
+    """Overwrite previous content of the file with tag statistics."""
     counter_of_tags = Counter(tags)
     tags_and_counts = counter_of_tags.most_common()
     sorted_tags_and_counts = sorted(
@@ -96,10 +96,12 @@ def write_tag_counts(tags: List[str], absolute_path: str) -> type(None):
             out_file.write(f'{tag}\t{count}\n')
 
 
-def add_to_commit(path_from_git_root: str) -> type(None):
+def add_to_commit(path_from_git_root: str) -> None:
     """
-    Add file or directory to the next commit (then post-commit hook
-    will commit it and transfer to the current commit before push).
+    Add file or directory to the next commit.
+
+    Then post-commit hook will commit it and transfer
+    to the current commit before push.
     """
     # `git add ..` can not be run from `.git/*`,
     # because this directory is outside of work tree.
@@ -113,6 +115,9 @@ def add_to_commit(path_from_git_root: str) -> type(None):
 
 
 def main():
+    """Manage updates."""
+    lint()
+
     relative_paths = {
         'source': '../../notes/',
         'counts': '../../supplementaries/counts_of_tags.tsv'
