@@ -10,9 +10,10 @@ Generally speaking, not all tasks should be done here, because
 it is desired to have no dependencies other than built-in Python packages
 in Git hooks.
 As of now, the list of covered tasks consists of these element:
-1) Update a file with counts of tags that appear at least once
+1) Check code style with 'lint' target from `Makefile`;
+2) Update a file with counts of tags that appear at least once
    in the most recent editions of notes;
-2) Validate human-written notes.
+3) Validate human-written notes.
 The script is called during every commit automatically if its copy
 is placed and named correctly.
 
@@ -32,6 +33,16 @@ def convert_to_absolute_path(relative_path: str) -> str:
     script_directory = os.path.dirname(__file__)
     absolute_path = os.path.join(script_directory, relative_path)
     return absolute_path
+
+
+def lint() -> None:
+    """Analyze code statically."""
+    rel_path_to_repo_root = '../../'
+    abs_path_to_repo_root = convert_to_absolute_path(rel_path_to_repo_root)
+    result = subprocess.run('make lint', cwd=abs_path_to_repo_root, shell=True)
+    return_code = result.returncode
+    if return_code:
+        raise ValueError('Lint target failed.')
 
 
 def validate_cell_header(
@@ -105,6 +116,8 @@ def add_to_commit(path_from_git_root: str) -> None:
 
 def main():
     """Manage updates."""
+    lint()
+
     relative_paths = {
         'source': '../../notes/',
         'counts': '../../supplementaries/counts_of_tags.tsv'
