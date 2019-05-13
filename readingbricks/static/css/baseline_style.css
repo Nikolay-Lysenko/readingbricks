@@ -13,6 +13,20 @@ h3, h4, p {
 li, ol, ul {
     text-align: justify;
 }
+p {
+    margin-bottom: 0%;
+}
+ul {
+    margin-top: 0.25%;
+}
+ol {
+    margin-top: 0.5%;
+}
+li > p {
+    text-indent: 0px;  /* Suppress indenting text relatively a list marker that is indented itself. */
+    margin-top: 0%;
+    margin-bottom: 0.25%;
+}
 input {
     width: 100%;
 }
@@ -27,11 +41,6 @@ a:visited {
 h2 a:link, h2 a:visited {
     color: black;
     text-decoration: none;
-}
-
-/* Suppress indenting text relatively a list marker that is indented itself. */
-li > p {
-    text-indent: 0px;
 }
 
 /* Custom divisions */
