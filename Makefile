@@ -19,7 +19,6 @@ clean:
 	@echo "Cleaned."
 
 venv: requirements/test.txt
-	pip install setuptools==45  # Temporary workaround for a `setuptools` bug. 
 	test -d venv || virtualenv --python=python3.6 venv
 	. venv/bin/activate; pip install -r requirements/test.txt; pip install -e .
 
