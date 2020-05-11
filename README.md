@@ -12,7 +12,7 @@ Two key parts of the repository are as follows:
 * The notes itself, all of them are written specially for this project;
 * Search system.
 
-Currently, there are a small number of notes and so there is no need in complicated search system. However, an outline of its evolution is created. Planned features of the search system are as follows:
+Currently, there is a small number of notes and so there is no need in complicated search system. However, an outline of its evolution is created. Planned features of the search system are as follows:
 - [x] Search by single tag
 - [x] Logical operators
 - [ ] Support of tags hierarchy
