@@ -14,7 +14,7 @@ Flask-Markdown==0.3
 Flask-Misaka==1.0.0
 idna==2.7
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 Markdown==3.0.1
 MarkupSafe==1.1.1
 mccabe==0.6.1
