@@ -21,7 +21,7 @@ mccabe==0.6.1
 misaka==2.1.0
 more-itertools==4.3.0
 pluggy==0.8.0
-py==1.7.0
+py==1.10.0
 pycodestyle==2.4.0
 pycparser==2.19
 pydocstyle==3.0.0
