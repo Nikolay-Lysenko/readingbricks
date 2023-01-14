@@ -19,7 +19,7 @@ clean:
 	@echo "Cleaned."
 
 venv: requirements/test.txt
-	test -d venv || virtualenv --python=python3.6 venv
+	test -d venv || virtualenv --python=python3.10 venv
 	. venv/bin/activate; pip install -r requirements/test.txt; pip install -e .
 
 lint: venv
