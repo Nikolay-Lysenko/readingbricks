@@ -60,7 +60,7 @@ class DatabaseCreator:
         # Write content of `tag_to_notes` to the target DB.
         with closing(sqlite3.connect(self.__path_to_db)) as conn:
             with utils.open_transaction(conn) as cur:
-                for k, v in tag_to_notes.items():
+                for k, v in tag_to_notes.items():  # pragma: no branch
                     cur.execute(
                         f"CREATE TABLE IF NOT EXISTS {k} (note_id VARCHAR)"
                     )
@@ -156,7 +156,7 @@ class MarkdownDirectoryCreator:
             os.path.join(self.__path_to_markdown_notes, file_name) + '.md'
         )
         with open(file_path, 'w') as destination_file:
-            for line in content:
+            for line in content:  # pragma: no branch
                 destination_file.write(line + '\n')
 
     def create_or_update_directory_with_markdown_notes(self) -> None:

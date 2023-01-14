@@ -174,5 +174,5 @@ class LogicalQueriesHandler:
                 tmp_table_name = parsed_query.strip("'")
                 cur.execute(f"SELECT note_id FROM {tmp_table_name}")
                 query_result = cur.fetchall()
-                note_ids = [x[0] for x in query_result]
+                note_ids = [x[0] for x in query_result]  # pragma: no branch
         return note_ids

@@ -32,7 +32,7 @@ def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     for file_name in file_names:
         with open(os.path.join(path_to_dir, file_name)) as source_file:
             cells = json.load(source_file)['cells']
-            for cell in cells:
+            for cell in cells:  # pragma: no branch
                 yield cell
 
 

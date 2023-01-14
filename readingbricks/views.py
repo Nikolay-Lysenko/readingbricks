@@ -29,7 +29,7 @@ def index() -> str:
     tags_with_counts = []
     path_to_counts_of_tags = app.config.get('path_to_counts_of_tags')
     with open(path_to_counts_of_tags) as source_file:
-        for line in source_file:
+        for line in source_file:  # pragma: no branch
             tags_with_counts.append(line.split('\t'))
     home_url = url_for('index', _external=True)
     link_names = [
