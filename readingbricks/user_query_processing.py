@@ -43,15 +43,15 @@ class LogicalQueriesHandler:
         # Put square brackets that indicate precedence of operations.
         extra_chars = pp.srange(r"[\0x80-\0x7FF]")  # Support Cyrillic letters.
         tag = pp.Word(pp.alphas + '_' + extra_chars)
-        parser = pp.operatorPrecedence(
+        parser = pp.infix_notation(
             tag,
             [
-                ("NOT", 1, pp.opAssoc.RIGHT),
-                ("AND", 2, pp.opAssoc.LEFT),
-                ("OR", 2, pp.opAssoc.LEFT)
+                ("NOT", 1, pp.OpAssoc.RIGHT),
+                ("AND", 2, pp.OpAssoc.LEFT),
+                ("OR", 2, pp.OpAssoc.LEFT)
             ]
         )
-        parsed_expression = parser.parseString(user_query)[0]
+        parsed_expression = parser.parse_string(user_query)[0]
         return str(parsed_expression)
 
     @staticmethod
