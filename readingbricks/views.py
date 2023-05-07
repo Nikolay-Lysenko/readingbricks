@@ -142,7 +142,7 @@ def page_for_query() -> str:
     A query may contain AND, OR, and NOT operators.
     """
     user_query = request.form['query']
-    default = "нейронные_сети AND (постановка_задачи OR байесовские_методы)"
+    default = "нейронные_сети AND (байесовские_методы OR методы_оптимизации)"
     user_query = user_query or default
     path_to_db = app.config.get('path_to_db')
     query_handler = LogicalQueriesHandler(path_to_db)
