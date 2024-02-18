@@ -10,13 +10,13 @@ import hashlib
 import json
 import sqlite3
 from contextlib import contextmanager
-from typing import Dict, Generator, Any
+from typing import Any, Generator
 
 # Note that there must be no dependencies other than Python built-ins,
 # because this module is imported by scripts that are used in Git hooks.
 
 
-def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
+def extract_cells(path_to_dir: str) -> Generator[dict[str, Any], None, None]:
     """
     Walk through directory and yield cells of notebooks from there.
 

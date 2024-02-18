@@ -13,7 +13,7 @@ import os
 import sqlite3
 from collections import defaultdict
 from contextlib import closing
-from typing import List, Dict, Any
+from typing import Any
 
 from readingbricks.paths import (
     get_path_to_ipynb_notes,
@@ -54,7 +54,7 @@ class MarkdownNotesMaker:
                 os.unlink(file_name)
 
     @staticmethod
-    def __insert_blank_line_before_each_list(content: List[str]) -> List[str]:
+    def __insert_blank_line_before_each_list(content: list[str]) -> list[str]:
         """Insert blank line before each Markdown list when it is needed by Misaka parser."""
         list_markers = ['* ', '- ', '+ ', '1. ']
         result = []
@@ -65,7 +65,7 @@ class MarkdownNotesMaker:
         result.append(content[-1])
         return result
 
-    def copy_cell_content_to_markdown_file(self, cell: Dict[str, Any],) -> None:
+    def copy_cell_content_to_markdown_file(self, cell: dict[str, Any]) -> None:
         """
         Extract content of the cell and save it as Markdown file in the specified directory.
 
@@ -76,7 +76,7 @@ class MarkdownNotesMaker:
         """
         content = [line.rstrip('\n') for line in cell['source']]
         content = self.__insert_blank_line_before_each_list(content)
-        note_title = content[0].lstrip('## ')
+        note_title = content[0].lstrip('# ')
         file_name = compress(note_title)
         file_path = os.path.join(self.__path_to_markdown_notes, file_name) + '.md'
         with open(file_path, 'w') as destination_file:
@@ -97,7 +97,7 @@ class TagCountsMaker:
         self.__path_to_tsv_file = path_to_tsv_file
         self.__tag_counts = defaultdict(lambda: 0)
 
-    def update_tags_counts(self, cell: Dict[str, Any]) -> None:
+    def update_tags_counts(self, cell: dict[str, Any]) -> None:
         """
         Increase counters for cell tags.
 
@@ -143,7 +143,7 @@ class TagToNotesDatabaseMaker:
         self.__path_to_db = path_to_db
         self.__tag_to_notes = defaultdict(lambda: [])
 
-    def update_mapping_of_tags_to_notes(self, cell: Dict[str, Any]) -> None:
+    def update_mapping_of_tags_to_notes(self, cell: dict[str, Any]) -> None:
         """
         Add cell header to the lists corresponding to its tags.
 
@@ -153,7 +153,7 @@ class TagToNotesDatabaseMaker:
             None
         """
         cell_header = cell['source'][0].rstrip('\n')
-        cell_header = cell_header.lstrip('## ')
+        cell_header = cell_header.lstrip('# ')
         cell_tags = cell['metadata']['tags'] + ['all_notes']
         for tag in cell_tags:
             self.__tag_to_notes[tag].append(cell_header)

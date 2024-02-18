@@ -9,7 +9,7 @@ import os
 import sqlite3
 import contextlib
 from functools import reduce
-from typing import List, Tuple, Optional
+from typing import Optional
 
 from flask import render_template, url_for, request
 from flask_misaka import Misaka
@@ -130,7 +130,7 @@ def page_with_note(domain_title: str, note_title: str) -> str:
     return content_with_css
 
 
-def page_for_list_of_ids(domain_title: str, page_title: str, note_ids: List[str]) -> str:
+def page_for_list_of_ids(domain_title: str, page_title: str, note_ids: list[str]) -> str:
     """Render in HTML a page with all notes from the specified list."""
     domain_url = url_for('domain', domain_title=domain_title)
     notes_content = []
@@ -189,6 +189,6 @@ def page_for_query(domain_title: str) -> str:
 
 
 @app.errorhandler(404)
-def page_not_found(_) -> Tuple[str, int]:
+def page_not_found(_) -> tuple[str, int]:
     """Render template for unknown page."""
     return render_template('404.html'), 404
