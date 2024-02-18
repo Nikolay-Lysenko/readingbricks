@@ -25,7 +25,7 @@ def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     :yield:
         cells as dictionaries
     """
-    for file_name in os.listdir(path_to_dir):
+    for file_name in sorted(os.listdir(path_to_dir)):
         file_path = os.path.join(path_to_dir, file_name)
         if not os.path.isfile(file_path) or not file_name.endswith('.ipynb'):
             continue
