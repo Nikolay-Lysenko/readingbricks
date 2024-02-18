@@ -8,7 +8,6 @@ Author: Nikolay Lysenko
 import sqlite3
 import contextlib
 import string
-from typing import List
 
 import pyparsing as pp
 
@@ -59,7 +58,7 @@ class LogicalQueriesHandler:
         return str(parsed_expression)
 
     @staticmethod
-    def __compose_sql_query(operator: str, operands: List[str]) -> str:
+    def __compose_sql_query(operator: str, operands: list[str]) -> str:
         """Turn logical operation into SQL query that performs it."""
         if operator == 'AND':
             operands_and_aliases = list(zip(operands, string.ascii_lowercase))
@@ -118,7 +117,7 @@ class LogicalQueriesHandler:
             raise ValueError(f"Unknown operator: {operator}")
         return query
 
-    def __create_tmp_table(self, leaf: List[str], cur: sqlite3.Cursor) -> str:
+    def __create_tmp_table(self, leaf: list[str], cur: sqlite3.Cursor) -> str:
         """
         Create temporary table for a single leaf.
 
@@ -158,7 +157,7 @@ class LogicalQueriesHandler:
         tmp_table_name = self.__create_tmp_table(leaf_as_list, cur)
         return pre_leaf + tmp_table_name + post_leaf
 
-    def find_all_relevant_notes(self, user_query: str) -> List[str]:
+    def find_all_relevant_notes(self, user_query: str) -> list[str]:
         """
         Return list of notes that match the query.
 
