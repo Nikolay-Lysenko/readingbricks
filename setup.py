@@ -28,7 +28,10 @@ setup(
     include_package_data=True,  # For CSS files and so on.
     python_requires='>=3.6',
     install_requires=[
-        'Flask', 'Flask-Markdown', 'Flask-Misaka',
-        'pyparsing', 'python-markdown-math'
+        'Flask',
+        'Flask-Markdown',
+        'Flask-Misaka',
+        'pyparsing',
+        'python-markdown-math'
     ]
 )

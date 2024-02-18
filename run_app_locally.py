@@ -1,13 +1,13 @@
 """
-This script launches Flask application locally.
+Launch Flask application locally.
 
 Author: Nikolay Lysenko
 """
 
 
 from readingbricks import app
-from readingbricks.resources import provide_resources
+from readingbricks.resources import make_resources
 
 
-provide_resources()
+make_resources()
 app.run(debug=True)

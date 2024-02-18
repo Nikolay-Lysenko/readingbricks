@@ -1,5 +1,5 @@
 """
-This module parses user queries and selects matching notes.
+Parse tag-based user queries and select matching notes.
 
 Author: Nikolay Lysenko
 """
@@ -15,23 +15,27 @@ import pyparsing as pp
 
 class LogicalQueriesHandler:
     """
-    Processor of queries that returns list of matching notes.
+    Processor of tag-based queries that returns list of matching notes.
 
-    A query of a special form is converted to SQL statement,
-    database interaction starts, and list of matching notes
-    is returned as a result.
+    The execution pipeline looks like this:
+    * a query of a proper form is converted to SQL statement,
+    * database interaction starts,
+    * list of matching notes is returned as a result.
 
-    Valid query can involve only tags, logical operators
-    (i.e., AND, OR, and NOT), parentheses, and spaces.
+    Valid query can involve only these entities:
+    * tags,
+    * logical operators (i.e., AND, OR, and NOT),
+    * parentheses,
+    * spaces.
+
     An example of a query that can be processed by this class:
     "neural_networks AND (problem_setup OR bayesian_methods)".
-    Response to this query is a list of all notes tagged with
-    "neural networks" tag and at least one of "problem_setup" and
-    "bayesian_methods" tags.
+
+    Response to this query is a list of all notes tagged with "neural networks" tag
+    and at least one of "problem_setup" and "bayesian_methods" tags.
 
     :param path_to_db:
-        absolute path to SQLite database with tables representing tags
-        and rows representing notes
+        absolute path to SQLite database with tables representing tags and rows representing notes
     """
 
     def __init__(self, path_to_db: str):
@@ -40,7 +44,7 @@ class LogicalQueriesHandler:
 
     @staticmethod
     def __infer_precedence(user_query: str) -> str:
-        # Put square brackets that indicate precedence of operations.
+        """Put square brackets that indicate precedence of operations."""
         extra_chars = pp.srange(r"[\0x80-\0x7FF]")  # Support Cyrillic letters.
         tag = pp.Word(pp.alphas + '_' + extra_chars)
         parser = pp.infix_notation(
@@ -56,7 +60,7 @@ class LogicalQueriesHandler:
 
     @staticmethod
     def __compose_sql_query(operator: str, operands: List[str]) -> str:
-        # Turn logical operation into SQL query that performs it.
+        """Turn logical operation into SQL query that performs it."""
         if operator == 'AND':
             operands_and_aliases = list(zip(operands, string.ascii_lowercase))
             query = (
@@ -115,10 +119,12 @@ class LogicalQueriesHandler:
         return query
 
     def __create_tmp_table(self, leaf: List[str], cur: sqlite3.Cursor) -> str:
-        # Create temporary table for a single leaf.
-        # Here, leaf means a part of the parsed user query without any
-        # nested parts in it and a part means anything that is inside
-        # square brackets.
+        """
+        Create temporary table for a single leaf.
+
+        Here, leaf means a part of the parsed user query without any nested parts in it
+        and a part means anything that is inside square brackets.
+        """
         if 'NOT' in leaf:
             operator = 'NOT'
             operands = [leaf[1]]
@@ -141,8 +147,7 @@ class LogicalQueriesHandler:
             parsed_query: str,
             cur: sqlite3.Cursor
     ) -> str:
-        # Create a temporary table for a single leaf and return a query
-        # where this leaf is replaced with the name of the temporary table.
+        """Return a query where a leaf is replaced with the name of the table created for it."""
         parts = parsed_query.split(']')
         left_part = parts.pop(0)
         left_parts = left_part.split('[')
@@ -165,14 +170,12 @@ class LogicalQueriesHandler:
             IDs of matching notes
         """
         parsed_query = self.__infer_precedence(user_query)
-        with contextlib.closing(sqlite3.connect(self.__path_to_db)) as conn:
-            with contextlib.closing(conn.cursor()) as cur:
+        with contextlib.closing(sqlite3.connect(self.__path_to_db)) as connection:
+            with contextlib.closing(connection.cursor()) as cursor:
                 while ']' in parsed_query:
-                    parsed_query = self.__replace_leaf_with_tmp_table(
-                        parsed_query, cur
-                    )
+                    parsed_query = self.__replace_leaf_with_tmp_table(parsed_query, cursor)
                 tmp_table_name = parsed_query.strip("'")
-                cur.execute(f"SELECT note_id FROM {tmp_table_name}")
-                query_result = cur.fetchall()
+                cursor.execute(f"SELECT note_id FROM {tmp_table_name}")
+                query_result = cursor.fetchall()
                 note_ids = [x[0] for x in query_result]  # pragma: no branch
         return note_ids

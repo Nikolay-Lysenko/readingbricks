@@ -114,5 +114,4 @@ ENV/
 nohup.out
 
 # Project-specific files
-.markdown_notes/
-notes_for_the_last_query.ipynb
+resources/
