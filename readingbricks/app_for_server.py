@@ -1,7 +1,5 @@
 """
-The script is a connector between the Flask app and a web server.
-
-For example, `uwsgi` can be used as a web server.
+Connect the Flask app to a web server (for example, `uwsgi`).
 
 Author: Nikolay Lysenko
 """

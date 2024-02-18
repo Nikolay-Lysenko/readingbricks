@@ -1,19 +1,19 @@
 """
-It is just a small module for auxiliary tools.
+Provide auxiliary tools.
 
 Author: Nikolay Lysenko
 """
 
 
 import os
+import hashlib
 import json
 import sqlite3
-import hashlib
 from contextlib import contextmanager
 from typing import Dict, Generator, Any
 
 # Note that there must be no dependencies other than Python built-ins,
-# because this module is imported by scripts from `supplementaries`.
+# because this module is imported by scripts that are used in Git hooks.
 
 
 def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
@@ -25,12 +25,11 @@ def extract_cells(path_to_dir: str) -> Generator[Dict[str, Any], None, None]:
     :yield:
         cells as dictionaries
     """
-    file_names = [
-        x for x in os.listdir(path_to_dir)
-        if os.path.isfile(os.path.join(path_to_dir, x)) and not x.endswith('~')
-    ]
-    for file_name in file_names:
-        with open(os.path.join(path_to_dir, file_name)) as source_file:
+    for file_name in os.listdir(path_to_dir):
+        file_path = os.path.join(path_to_dir, file_name)
+        if not os.path.isfile(file_path) or not file_name.endswith('.ipynb'):
+            continue
+        with open(file_path) as source_file:
             cells = json.load(source_file)['cells']
             for cell in cells:  # pragma: no branch
                 yield cell
@@ -40,9 +39,8 @@ def compress(string: str, max_length: int = 64) -> str:
     """
     Compress a string to a string of restricted length.
 
-    The function can be useful, because some filesystems and/or
-    disk encryption tools impose restriction on maximum length of
-    a filename.
+    The function can be useful, because some filesystems and/or disk encryption tools
+    impose restriction on maximum length of a filename.
 
     :param string:
         string to be compressed
@@ -58,17 +56,24 @@ def compress(string: str, max_length: int = 64) -> str:
 
 @contextmanager
 def open_transaction(
-        conn: sqlite3.Connection
+        connection: sqlite3.Connection
 ) -> Generator[sqlite3.Cursor, None, None]:
-    """Open transaction to SQLite database within a context."""
-    cur = conn.cursor()
-    cur.execute('BEGIN TRANSACTION')
+    """
+    Open transaction to SQLite database within a context.
+
+    :param connection:
+        connection to SQLite database
+    :return:
+        cursor such that changes made with it are either committed or rolled back
+    """
+    cursor = connection.cursor()
+    cursor.execute('BEGIN TRANSACTION')
     try:
-        yield cur
+        yield cursor
     except Exception as e:  # pragma: no cover
         print(e)
-        cur.execute('ROLLBACK')
+        cursor.execute('ROLLBACK')
     else:
-        cur.execute('COMMIT')
+        cursor.execute('COMMIT')
     finally:
-        cur.close()
+        cursor.close()
