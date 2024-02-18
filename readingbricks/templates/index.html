@@ -6,15 +6,11 @@
         <link rel=icon type=image/png href="{{ url_for('static', filename='images/favicon.png') }}"/>
     </head>
     <body>
-        <div id="central">
-            <div id="search_bar">
-                <form action='/query' method='post'>
-                    <input type='text' name="query" placeholder="нейронные_сети AND (байесовские_методы OR методы_оптимизации)">
-                </form>
-            </div>
-            <div id="tags_cloud">
-                <h2>На данный момент доступны следующие метки:</h2>
-                {{ tags_cloud }}
+        <nav id="frozen_button_one"><a href="{{ url_for('about') }}" class="button">?</a></nav>
+        <h2>В приложении появилась разбивка на предметные области, но пока ничего нового нет.</h2>
+        <div id="narrow_central">
+            <div id="domains_cloud">
+                {{ domains_cloud }}
             </div>
         </div>
     </body>

@@ -6,13 +6,15 @@
         <link rel=icon type=image/png href="{{ url_for('static', filename='images/favicon.png') }}"/>
     </head>
     <body>
-        <nav id="mainpage"><a href="{{ url_for('index') }}" class="button">⌂</a></nav>
+        <nav id="frozen_button_one"><a href="{{ url_for('index') }}" class="button">/</a></nav>
+        <nav id="frozen_button_two"><a href="{{ domain_url }}" class="button">⌂</a></nav>
+        <nav id="frozen_button_three"><a href="{{ url_for('about') }}" class="button">?</a></nav>
         <div id="central">
             <div id="content">
                 <h2>Запрос не может быть обработан</h2>
                 <p>Введён следующий запрос:</p>
                 <p><span style="background-color: #f1ece8">{{ user_query }}</span></p>
-                <p>Проверьте синтаксис — разрешены только круглые скобки и операторы AND и OR. Также проверьте правильность написания меток: возможно, для какой-либо метки использован пробел вместо нижнего подчёркивания.</p>
+                <p>Проверьте синтаксис — разрешены только существующие метки, круглые скобки и операторы AND, OR и NOT. Также проверьте правильность написания меток: возможно, для какой-либо метки использован пробел вместо нижнего подчёркивания.</p>
             </div>
         </div>
     </body>

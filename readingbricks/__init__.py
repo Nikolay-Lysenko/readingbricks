@@ -1,5 +1,5 @@
 """
-This is the script that initializes Flask app.
+Initialize Flask app.
 
 Author: Nikolay Lysenko
 """
@@ -7,14 +7,21 @@ Author: Nikolay Lysenko
 
 from flask import Flask
 
-from readingbricks import settings
+from readingbricks.constants import DOMAINS
+from readingbricks.paths import (
+    get_path_to_markdown_notes,
+    get_path_to_tag_counts,
+    get_path_to_tag_to_notes_db
+)
 
 
 app = Flask(__name__)
-app.config['path_to_ipynb_notes'] = settings.get_path_to_ipynb_notes()
-app.config['path_to_markdown_notes'] = settings.get_path_to_markdown_notes()
-app.config['path_to_db'] = settings.get_path_to_db()
-app.config['path_to_counts_of_tags'] = settings.get_path_to_counts_of_tags()
+for domain in DOMAINS:
+    app.config[domain] = {
+        'path_to_markdown_notes': get_path_to_markdown_notes(domain),
+        'path_to_tag_counts': get_path_to_tag_counts(domain),
+        'path_to_tag_to_notes_db': get_path_to_tag_to_notes_db(domain)
+    }
 
 
 # Flask requires to import `views` after `app` is set
