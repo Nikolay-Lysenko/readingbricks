@@ -44,9 +44,23 @@ h2 a:link, h2 a:visited {
 }
 
 /* Custom divisions */
-#mainpage {
+#frozen_button_one {
     position: fixed;
     top: 2.5%;
+    left: 2.5%;
+    width: 10%;
+    text-align: left;
+}
+#frozen_button_two {
+    position: fixed;
+    top: 10%;
+    left: 2.5%;
+    width: 10%;
+    text-align: left;
+}
+#frozen_button_three {
+    position: fixed;
+    top: 17.5%;
     left: 2.5%;
     width: 10%;
     text-align: left;
@@ -57,7 +71,15 @@ h2 a:link, h2 a:visited {
     margin-top: 1%;
     margin-bottom: 1%;
     width: 75%;
-    text-align:center;
+    text-align: center;
+}
+#narrow_central {
+    background-color: #f9f9f9;
+    margin: auto;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    width: 50%;
+    text-align: center;
 }
 #content {
     margin: auto;
@@ -72,8 +94,16 @@ h2 a:link, h2 a:visited {
     width: 95%;
     max-width: 1000px;
 }
+#domains_cloud {
+    margin: auto;
+    margin-top: 15%;
+    text-align: center;
+    padding-bottom: 1%;
+    width: 95%;
+}
 #tags_cloud {
     margin: auto;
+    margin-top: 5%;
     text-align: center;
     padding-bottom: 5%;
     width: 95%;
