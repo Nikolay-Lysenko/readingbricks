@@ -5,8 +5,21 @@ Author: Nikolay Lysenko
 """
 
 
-DOMAINS = ["machine_learning"]
-DOMAIN_TO_TRANSLATION = {"machine_learning": "Машинное обучение"}
-DOMAIN_TO_SEARCH_PROMPT = {
-    "machine_learning": "нейронные_сети AND (байесовские_методы OR методы_оптимизации)"
+import os
+
+
+DOMAINS = [
+    "machine_learning",
+]
+DOMAIN_TO_ALIAS = {
+    "machine_learning": "Машинное обучение",
 }
+DOMAIN_TO_SEARCH_PROMPT = {
+    "machine_learning": "нейронные_сети AND (байесовские_методы OR методы_оптимизации)",
+}
+
+NOTES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "notes"))
+RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "resources")
+MARKDOWN_DIR_NAME = "markdown_notes"
+TAG_COUNTS_FILE_NAME = "tag_counts.tsv"
+TAG_TO_NOTES_DB_FILE_NAME = "tag_to_notes.db"

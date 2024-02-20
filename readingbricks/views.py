@@ -16,7 +16,6 @@ from flask_misaka import Misaka
 from markupsafe import Markup
 
 from readingbricks import app
-from readingbricks.constants import DOMAINS, DOMAIN_TO_SEARCH_PROMPT, DOMAIN_TO_TRANSLATION
 from readingbricks.user_query_processing import LogicalQueriesHandler
 from readingbricks.utils import compress
 
@@ -30,9 +29,9 @@ def index() -> str:
     """Render home page."""
     home_url = url_for('index', _external=True)
     links_to_domains = []
-    for domain_title in DOMAINS:
-        translation = DOMAIN_TO_TRANSLATION.get(domain_title, domain_title)
-        link = f'<a href={home_url}{domain_title} class="button">{translation}</a>'
+    for domain_title in app.config['DOMAINS']:
+        domain_alias = app.config['DOMAIN_TO_ALIAS'].get(domain_title, domain_title)
+        link = f'<a href={home_url}{domain_title} class="button">{domain_alias}</a>'
         link = f'<div>{link}</div>\n'
         links_to_domains.append(link)
     domains_cloud = Markup(''.join(links_to_domains))
@@ -49,11 +48,13 @@ def about() -> str:
 @app.route('/<domain_title>')
 def domain(domain_title: str) -> str:
     """Render page of a particular domain."""
-    domain_translation = DOMAIN_TO_TRANSLATION.get(domain_title, domain_title)
-    search_prompt = DOMAIN_TO_SEARCH_PROMPT.get(domain_title, "")
+    domain_alias = app.config['DOMAIN_TO_ALIAS'].get(domain_title, domain_title)
+    search_prompt = app.config['DOMAIN_TO_SEARCH_PROMPT'].get(domain_title, "")
 
     tags_with_counts = []
-    path_to_tag_counts = app.config.get(domain_title)['path_to_tag_counts']
+    path_to_tag_counts = os.path.join(
+        app.config.get("RESOURCES_DIR"), domain_title, app.config.get("TAG_COUNTS_FILE_NAME")
+    )
     with open(path_to_tag_counts) as source_file:
         for line in source_file:  # pragma: no branch
             tags_with_counts.append(line.split('\t'))
@@ -100,7 +101,9 @@ def convert_note_from_markdown_to_html(domain_title: str, note_id: str) -> Optio
 
     If requested note does not exist, return `None`.
     """
-    dir_path = app.config.get(domain_title)['path_to_markdown_notes']
+    dir_path = os.path.join(
+        app.config.get("RESOURCES_DIR"), domain_title, app.config.get("MARKDOWN_DIR_NAME")
+    )
     abs_requested_path = os.path.join(dir_path, f'{note_id}.md')
     if not os.path.isfile(abs_requested_path):
         return None
@@ -145,7 +148,9 @@ def page_for_list_of_ids(domain_title: str, page_title: str, note_ids: list[str]
 @app.route('/<domain_title>/tags/<tag>')
 def page_for_tag(domain_title: str, tag: str) -> str:
     """Render in HTML a page with all notes that have the specified tag."""
-    path_to_db = app.config.get(domain_title)['path_to_tag_to_notes_db']
+    path_to_db = os.path.join(
+        app.config.get("RESOURCES_DIR"), domain_title, app.config.get("TAG_TO_NOTES_DB_FILE_NAME")
+    )
     try:
         with contextlib.closing(sqlite3.connect(path_to_db)) as connection:
             with contextlib.closing(connection.cursor()) as cursor:
@@ -169,12 +174,14 @@ def page_for_query(domain_title: str) -> str:
     domain_url = url_for('domain', domain_title=domain_title)
 
     user_query = request.form['query']
-    default = DOMAIN_TO_SEARCH_PROMPT.get(domain_title, "")
+    default = app.config['DOMAIN_TO_SEARCH_PROMPT'].get(domain_title, "tag")
     user_query = user_query or default
     if not user_query:
         return render_template('invalid_query.html', **locals())
 
-    path_to_db = app.config.get(domain_title)['path_to_tag_to_notes_db']
+    path_to_db = os.path.join(
+        app.config.get("RESOURCES_DIR"), domain_title, app.config.get("TAG_TO_NOTES_DB_FILE_NAME")
+    )
     query_handler = LogicalQueriesHandler(path_to_db)
     try:
         note_ids = query_handler.find_all_relevant_notes(user_query)
