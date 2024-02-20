@@ -1,6 +1,6 @@
 -c constraints.txt
-Flask==2.2.3
+Flask==3.0.2
 Flask-Markdown==0.3
-Flask-Misaka==1.0.0
-pyparsing==3.0.9
+Flask-Misaka==1.0.1
+pyparsing==3.1.1
 python-markdown-math==0.8
