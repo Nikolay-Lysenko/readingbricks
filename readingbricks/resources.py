@@ -15,11 +15,12 @@ from collections import defaultdict
 from contextlib import closing
 from typing import Any
 
-from readingbricks.paths import (
-    get_path_to_ipynb_notes,
-    get_path_to_markdown_notes,
-    get_path_to_tag_counts,
-    get_path_to_tag_to_notes_db
+from readingbricks.constants import (
+    NOTES_DIR,
+    RESOURCES_DIR,
+    MARKDOWN_DIR_NAME,
+    TAG_COUNTS_FILE_NAME,
+    TAG_TO_NOTES_DB_FILE_NAME,
 )
 from readingbricks.utils import compress, extract_cells, open_transaction
 
@@ -200,6 +201,14 @@ def make_resources_for_single_domain(
     """
     Make resources for a single directory representing a particular domain.
 
+    :param ipynb_dir:
+        path to existing directory with Jupyter notebooks
+    :param markdown_dir:
+        path to directory where Markdown files with notes should be created
+    :param tag_counts_path:
+        path to tag counts TSV file to be created
+    :param tag_to_notes_db_path:
+        path to SQLite DB file to be created
     :return:
         None
     """
@@ -218,27 +227,30 @@ def make_resources_for_single_domain(
     tag_to_notes_db_maker.write_tag_to_notes_mapping_to_db()
 
 
-def make_resources() -> None:
+def make_resources(notes_dir: str, resources_dir: str) -> None:
     """
     Make all resources.
 
+    :param notes_dir:
+        outer directory with notes in Jupyter format
+    :param resources_dir:
+        directory where resources are going to be created
     :return:
         None
     """
-    outer_ipynb_dir = get_path_to_ipynb_notes()
-    for object_name in os.listdir(outer_ipynb_dir):
-        object_path = os.path.join(outer_ipynb_dir, object_name)
+    for object_name in os.listdir(notes_dir):
+        object_path = os.path.join(notes_dir, object_name)
         if not os.path.isdir(object_path) or object_name.startswith('.'):
             continue
         domain = object_name
-        inner_ipynb_dir = object_path
+        nested_notes_dir = object_path
         make_resources_for_single_domain(
-            inner_ipynb_dir,
-            get_path_to_markdown_notes(domain),
-            get_path_to_tag_counts(domain),
-            get_path_to_tag_to_notes_db(domain)
+            nested_notes_dir,
+            os.path.join(resources_dir, domain, MARKDOWN_DIR_NAME),
+            os.path.join(resources_dir, domain, TAG_COUNTS_FILE_NAME),
+            os.path.join(resources_dir, domain, TAG_TO_NOTES_DB_FILE_NAME)
         )
 
 
 if __name__ == '__main__':
-    make_resources()
+    make_resources(NOTES_DIR, RESOURCES_DIR)
