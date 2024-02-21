@@ -9,7 +9,7 @@ import os
 import sqlite3
 import contextlib
 from functools import reduce
-from typing import Optional
+from typing import Optional, Union
 
 from flask import render_template, url_for, request
 from flask_misaka import Misaka
@@ -20,12 +20,15 @@ from readingbricks.user_query_processing import LogicalQueriesHandler
 from readingbricks.utils import compress
 
 
+RESPONSE_TYPE = Union[str, tuple[str, int]]  # Rendered page and, optionally, status code.
+
+
 markdown_preprocessor = Misaka()
 markdown_preprocessor.init_app(app)
 
 
 @app.route('/')
-def index() -> str:
+def index() -> RESPONSE_TYPE:
     """Render home page."""
     home_url = url_for('index', _external=True)
     links_to_domains = []
@@ -40,14 +43,16 @@ def index() -> str:
 
 
 @app.route('/about')
-def about() -> str:
+def about() -> RESPONSE_TYPE:
     """Render page with info about the project."""
     return render_template('about.html')
 
 
 @app.route('/<domain_title>')
-def domain(domain_title: str) -> str:
+def domain(domain_title: str) -> RESPONSE_TYPE:
     """Render page of a particular domain."""
+    if domain_title not in app.config['DOMAINS']:
+        return render_template('404.html'), 404
     domain_alias = app.config['DOMAIN_TO_ALIAS'].get(domain_title, domain_title)
     search_prompt = app.config['DOMAIN_TO_SEARCH_PROMPT'].get(domain_title, "")
 
@@ -120,20 +125,20 @@ def convert_note_from_markdown_to_html(domain_title: str, note_id: str) -> Optio
 
 
 @app.route('/<domain_title>/notes/<note_title>')
-def page_with_note(domain_title: str, note_title: str) -> str:
+def page_with_note(domain_title: str, note_title: str) -> RESPONSE_TYPE:
     """Render in HTML a page with exactly one note."""
     domain_url = url_for('domain', domain_title=domain_title)
     note_id = compress(note_title)
     content_in_html = convert_note_from_markdown_to_html(domain_title, note_id)
     if content_in_html is None:
-        return render_template('404.html')
+        return render_template('404.html'), 404
     page_title = note_title
     content_with_css = render_template('regular_page.html', **locals())
     content_with_css = content_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
     return content_with_css
 
 
-def page_for_list_of_ids(domain_title: str, page_title: str, note_ids: list[str]) -> str:
+def page_for_list_of_ids(domain_title: str, page_title: str, note_ids: list[str]) -> RESPONSE_TYPE:
     """Render in HTML a page with all notes from the specified list."""
     domain_url = url_for('domain', domain_title=domain_title)
     notes_content = []
@@ -146,7 +151,7 @@ def page_for_list_of_ids(domain_title: str, page_title: str, note_ids: list[str]
 
 
 @app.route('/<domain_title>/tags/<tag>')
-def page_for_tag(domain_title: str, tag: str) -> str:
+def page_for_tag(domain_title: str, tag: str) -> RESPONSE_TYPE:
     """Render in HTML a page with all notes that have the specified tag."""
     path_to_db = os.path.join(
         app.config.get("RESOURCES_DIR"), domain_title, app.config.get("TAG_TO_NOTES_DB_FILE_NAME")
@@ -158,14 +163,14 @@ def page_for_tag(domain_title: str, tag: str) -> str:
                 query_result = cursor.fetchall()
         note_ids = [x[0] for x in query_result]
     except sqlite3.OperationalError:
-        return render_template('404.html')
+        return render_template('404.html'), 404
     page_title = (tag[0].upper() + tag[1:]).replace('_', ' ')
     content_with_css = page_for_list_of_ids(domain_title, page_title, note_ids)
     return content_with_css
 
 
 @app.route('/<domain_title>/query', methods=['POST'])
-def page_for_query(domain_title: str) -> str:
+def page_for_query(domain_title: str) -> RESPONSE_TYPE:
     """
     Render in HTML a page with all notes that match user query.
 
@@ -176,8 +181,6 @@ def page_for_query(domain_title: str) -> str:
     user_query = request.form['query']
     default = app.config['DOMAIN_TO_SEARCH_PROMPT'].get(domain_title, "tag")
     user_query = user_query or default
-    if not user_query:
-        return render_template('invalid_query.html', **locals())
 
     path_to_db = os.path.join(
         app.config.get("RESOURCES_DIR"), domain_title, app.config.get("TAG_TO_NOTES_DB_FILE_NAME")
@@ -196,6 +199,6 @@ def page_for_query(domain_title: str) -> str:
 
 
 @app.errorhandler(404)
-def page_not_found(_) -> tuple[str, int]:
+def page_not_found(_) -> RESPONSE_TYPE:
     """Render template for unknown page."""
     return render_template('404.html'), 404
