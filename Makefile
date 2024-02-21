@@ -1,7 +1,8 @@
-.PHONY: help clean lint test coverage resources
+.PHONY: help hooks clean lint test coverage resources
 
 .DEFAULT: help
 help:
+	@echo "hooks - copy Git hooks from a directory under Git control to .git/hooks"
 	@echo "clean - delete virtual environment and artifacts of builds"
 	@echo "venv - create virtual environment and install the package there"
 	@echo "lint - check code style with flake8"
@@ -9,6 +10,9 @@ help:
 	@echo "coverage - run tests with pytest and report test coverage"
 	@echo "codecov - invoke codecov (should be used only within CI pipeline)"
 	@echo "resources - prepare resources for Flask launch with uwsgi server"
+
+hooks:
+	@cp git_hooks/pre_commit_hook.py .git/hooks/pre-commit
 
 clean:
 	@rm -rf venv
