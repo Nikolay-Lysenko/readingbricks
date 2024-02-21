@@ -192,14 +192,14 @@ class TagToNotesDatabaseMaker:
                 cursor.execute('VACUUM')
 
 
-def make_resources_for_single_domain(
+def make_resources_for_single_field(
         ipynb_dir: str,
         markdown_dir: str,
         tag_counts_path: str,
         tag_to_notes_db_path: str
 ) -> None:
     """
-    Make resources for a single directory representing a particular domain.
+    Make resources for a single directory representing a particular field of knowledge.
 
     :param ipynb_dir:
         path to existing directory with Jupyter notebooks
@@ -242,13 +242,13 @@ def make_resources(notes_dir: str, resources_dir: str) -> None:
         object_path = os.path.join(notes_dir, object_name)
         if not os.path.isdir(object_path) or object_name.startswith('.'):
             continue
-        domain = object_name
+        field = object_name
         nested_notes_dir = object_path
-        make_resources_for_single_domain(
+        make_resources_for_single_field(
             nested_notes_dir,
-            os.path.join(resources_dir, domain, MARKDOWN_DIR_NAME),
-            os.path.join(resources_dir, domain, TAG_COUNTS_FILE_NAME),
-            os.path.join(resources_dir, domain, TAG_TO_NOTES_DB_FILE_NAME)
+            os.path.join(resources_dir, field, MARKDOWN_DIR_NAME),
+            os.path.join(resources_dir, field, TAG_COUNTS_FILE_NAME),
+            os.path.join(resources_dir, field, TAG_TO_NOTES_DB_FILE_NAME)
         )
 
 

@@ -28,9 +28,9 @@ def resources() -> None:
 @pytest.fixture(scope='module')
 def test_client() -> flask.testing.FlaskClient:
     """Provide test client to Flask app."""
-    app.config["DOMAINS"] = ["digits_and_letters", "lorem_ipsum"]
-    app.config["DOMAIN_TO_ALIAS"] = {"digits_and_letters": "Digits & Letters"}
-    app.config["DOMAIN_TO_SEARCH_PROMPT"] = {"digits_and_letters": "digits"}
+    app.config["FIELDS"] = ["digits_and_letters", "lorem_ipsum"]
+    app.config["FIELD_TO_ALIAS"] = {"digits_and_letters": "Digits & Letters"}
+    app.config["FIELD_TO_SEARCH_PROMPT"] = {"digits_and_letters": "digits"}
     app.config["RESOURCES_DIR"] = os.path.join(os.path.dirname(__file__), "resources")
     with app.test_client() as testing_client:
         yield testing_client
