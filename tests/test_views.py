@@ -9,7 +9,7 @@ import flask.testing
 import pytest
 
 
-TITLE_TEMPLATE = '<h2><a href="http://localhost/{domain}/notes/{title}">{title}</a></h2>'
+TITLE_TEMPLATE = '<h2><a href="http://localhost/{field}/notes/{title}">{title}</a></h2>'
 
 
 def test_root_page(test_client: flask.testing.FlaskClient) -> None:
@@ -28,17 +28,17 @@ def test_info_page(test_client: flask.testing.FlaskClient) -> None:
 
 
 @pytest.mark.parametrize(
-    "domain, included_patterns",
+    "field, included_patterns",
     [
         ("digits_and_letters", ["letters (4)", "digits (2)", "list (1)"]),
         ("lorem_ipsum", ["lorem_ipsum (1)", "tag"]),
     ]
 )
-def test_domain_page(
-        test_client: flask.testing.FlaskClient, domain: str, included_patterns: list[str]
+def test_field_page(
+        test_client: flask.testing.FlaskClient, field: str, included_patterns: list[str]
 ) -> None:
-    """Test domain page."""
-    result = test_client.get(f"/{domain}").data.decode('utf-8')
+    """Test field page."""
+    result = test_client.get(f"/{field}").data.decode('utf-8')
     assert "/" in result
     assert "?" in result
     for pattern in included_patterns:
@@ -77,11 +77,11 @@ def test_page_not_found(test_client: flask.testing.FlaskClient, url: str) -> Non
                 "<li><p><em>c</em></p></li>",
                 "<li><p>\\(c\\)</p></li>",
                 '<a href="http://localhost/digits_and_letters/notes/B">link</a>',
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='C'),
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
             ],
         ),
     ]
@@ -110,17 +110,17 @@ def test_note_page(
             # `url`
             "/digits_and_letters/tags/digits",
             # `included_patterns`
-            [TITLE_TEMPLATE.format(domain='digits_and_letters', title='1')],
+            [TITLE_TEMPLATE.format(field='digits_and_letters', title='1')],
             # `absent_patterns`
-            [TITLE_TEMPLATE.format(domain='digits_and_letters', title='C')],
+            [TITLE_TEMPLATE.format(field='digits_and_letters', title='C')],
         ),
         (
             # `url`
             "/digits_and_letters/tags/list",
             # `included_patterns`
-            [TITLE_TEMPLATE.format(domain='digits_and_letters', title='C')],
+            [TITLE_TEMPLATE.format(field='digits_and_letters', title='C')],
             # `absent_patterns`
-            [TITLE_TEMPLATE.format(domain='digits_and_letters', title='B')],
+            [TITLE_TEMPLATE.format(field='digits_and_letters', title='B')],
         ),
     ]
 )
@@ -142,10 +142,10 @@ def test_tag_page(
 
 
 @pytest.mark.parametrize(
-    "domain, query, included_patterns, absent_patterns",
+    "field, query, included_patterns, absent_patterns",
     [
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "list AND letters",
@@ -155,11 +155,11 @@ def test_tag_page(
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1')
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='1')
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "list AND digits",
@@ -169,121 +169,121 @@ def test_tag_page(
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='B')
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='B')
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "list OR letters",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1')
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='1')
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "list OR digits",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='1'),
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A')
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A')
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "NOT list",
             # `included_patterns`
             [
                 '<p>1</p>',
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C')
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='C')
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "NOT letters",
             # `included_patterns`
             [
                 '<p>2</p>',
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='1'),
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A')
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A')
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "(list AND letters) OR (digits AND letters)",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='C'),
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='B'),
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='B'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='1'),
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "(list AND letters) AND ((digits OR letters OR list) OR list)",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='C'),
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='B'),
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='B'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='1'),
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "digits OR NOT (letters AND NOT list)",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='1'),
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='D'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='D'),
             ],
         ),
         (
-            # `domain`
+            # `field`
             "digits_and_letters",
             # `query`
             "(list AND letters) AND ((digits OR letters OR list) OR lists)",
@@ -293,22 +293,22 @@ def test_tag_page(
             ],
             # `absent_patterns`
             [
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='B'),
-                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='B'),
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='C'),
             ],
         ),
     ]
 )
 def test_tag_query_page(
         test_client: flask.testing.FlaskClient,
-        domain: str,
+        field: str,
         query: str,
         included_patterns: list[str],
         absent_patterns: list[str]
 ) -> None:
     """Test page with results of search by tags."""
-    result = test_client.post(f'/{domain}/query', data={'query': query}).data.decode('utf-8')
+    result = test_client.post(f'/{field}/query', data={'query': query}).data.decode('utf-8')
     assert "/" in result
     assert "⌂" in result
     assert "?" in result

@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>ReadingBricks - {{ domain_alias }}</title>
+        <title>ReadingBricks - {{ field_alias }}</title>
         <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/baseline_style.css') }}"/>
         <link rel=icon type=image/png href="{{ url_for('static', filename='images/favicon.png') }}"/>
     </head>
@@ -10,7 +10,7 @@
         <nav id="frozen_button_two"><a href="{{ url_for('about') }}" class="button">?</a></nav>
         <div id="central">
             <div id="search_bar">
-                <form action='/{{ domain_title }}/query' method='post'>
+                <form action='/{{ field_name }}/query' method='post'>
                     <input type='text' name="query" placeholder="{{ search_prompt }}">
                 </form>
             </div>

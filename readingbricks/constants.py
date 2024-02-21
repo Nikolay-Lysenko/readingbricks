@@ -8,13 +8,13 @@ Author: Nikolay Lysenko
 import os
 
 
-DOMAINS = [
+FIELDS = [
     "machine_learning",
 ]
-DOMAIN_TO_ALIAS = {
+FIELD_TO_ALIAS = {
     "machine_learning": "Машинное обучение",
 }
-DOMAIN_TO_SEARCH_PROMPT = {
+FIELD_TO_SEARCH_PROMPT = {
     "machine_learning": "нейронные_сети AND (байесовские_методы OR методы_оптимизации)",
 }
 
