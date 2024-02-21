@@ -15,7 +15,7 @@ from readingbricks import app
 from readingbricks.resources import make_resources
 
 
-@pytest.fixture(scope='package')
+@pytest.fixture(scope='package', autouse=True)
 def resources() -> None:
     """Generate resources for test app."""
     notes_dir = os.path.join(os.path.dirname(__file__), "notes")

@@ -1,178 +1,318 @@
 """
-Tests of functions that render HTML pages.
+Test `views` module.
 
 Author: Nikolay Lysenko
 """
 
 
-import unittest
-import os
-
-from readingbricks import app
-from readingbricks.resources import provide_resources
+import flask.testing
+import pytest
 
 
-class TestViews(unittest.TestCase):
-    """Tests of functions for rendering pages in HTML."""
-
-    title_template = (
-        '<h2><a href="http://localhost/notes/{title}">{title}</a></h2>'
-    )
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        """Do preparations that must be done once before all tests."""
-        app.testing = True
-
-        dir_path = os.path.dirname(__file__)
-        ipynb_path = os.path.join(dir_path, 'resources/sample_notebooks')
-        markdown_path = os.path.join(dir_path, '.markdown_notes')
-        db_path = os.path.join(dir_path, 'tag_to_notes.db')
-        counts_path = os.path.join(dir_path, 'resources/counts_of_tags.tsv')
-
-        provide_resources(ipynb_path, markdown_path, db_path)
-
-        app.config['path_to_ipynb_notes'] = ipynb_path
-        app.config['path_to_markdown_notes'] = markdown_path
-        app.config['path_to_db'] = db_path
-        app.config['path_to_counts_of_tags'] = counts_path
-
-    def setUp(self) -> None:
-        """Do preparations that must be done before each test."""
-        self.app = app.test_client()
-
-    def test_home_page(self) -> None:
-        """Test home page."""
-        result = self.app.get('/').data.decode('utf-8')
-        self.assertTrue('letters (4)' in result)
-        self.assertTrue('digits (2)' in result)
-        self.assertTrue('list (1)' in result)
-
-    def test_default_page(self) -> None:
-        """Test page that is shown when requested page is not found."""
-        response = self.app.get('/non_existing')
-        result = response.data.decode('utf-8')
-        status_code = response.status_code
-        self.assertTrue('<title>Страница не найдена</title>' in result)
-        self.assertEqual(status_code, 404)
-
-    def test_page_for_note(self) -> None:
-        """Test page with a single note."""
-        result = self.app.get('/notes/C').data.decode('utf-8')
-        self.assertTrue('C:' in result)
-        self.assertTrue('<li><p><em>c</em></p></li>' in result)
-        self.assertTrue('<li><p>\\(c\\)</p></li>' in result)
-        html_link = '<a href="http://localhost/notes/B">link</a>'
-        self.assertTrue(html_link in result)
-        self.assertFalse(self.title_template.format(title='A') in result)
-        result = self.app.get('/notes/non_existing').data.decode('utf-8')
-        self.assertTrue('Страница не найдена.' in result)
-
-    def test_page_for_tag(self) -> None:
-        """Test page with all notes tagged with a specified tag."""
-        result = self.app.get('/tags/digits').data.decode('utf-8')
-        self.assertTrue(self.title_template.format(title='1') in result)
-        self.assertFalse(self.title_template.format(title='A') in result)
-
-        result = self.app.get('/tags/list').data.decode('utf-8')
-        self.assertTrue(self.title_template.format(title='C') in result)
-        self.assertFalse(self.title_template.format(title='A') in result)
-
-        result = self.app.get('/tags/non_existing').data.decode('utf-8')
-        self.assertTrue('Страница не найдена.' in result)
-
-    def test_page_for_query_with_and(self) -> None:
-        """Test search bar requests with AND operator."""
-        query = 'list AND letters'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertTrue('C:' in result)
-        self.assertTrue('<li><p><em>c</em></p></li>' in result)
-        self.assertTrue('<li><p>\\(c\\)</p></li>' in result)
-        self.assertFalse(self.title_template.format(title='1') in result)
-
-        query = 'list AND digits'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertTrue('h2>Ничего не найдено</h2>' in result)
-
-    def test_page_for_query_with_or(self) -> None:
-        """Test search bar requests with OR operator."""
-        query = 'list OR letters'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertTrue(self.title_template.format(title='A') in result)
-        self.assertFalse(self.title_template.format(title='1') in result)
-        self.assertTrue('<li><p><em>c</em></p></li>' in result)
-
-        query = 'list OR digits'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertFalse(self.title_template.format(title='A') in result)
-        self.assertTrue(self.title_template.format(title='1') in result)
-        self.assertTrue('<li><p><em>c</em></p></li>' in result)
-
-    def test_page_for_query_with_not(self) -> None:
-        """Test search bar requests with NOT operator."""
-        query = 'NOT list'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertTrue(self.title_template.format(title='A') in result)
-        self.assertFalse(self.title_template.format(title='C') in result)
-        self.assertTrue('<p>1</p>' in result)
-
-        query = 'NOT letters'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertFalse(self.title_template.format(title='A') in result)
-        self.assertTrue(self.title_template.format(title='1') in result)
-        self.assertTrue('<p>2</p>' in result)
-
-    def test_page_for_complex_query(self) -> None:
-        """Test search bar requests with NOT, AND, and OR operators."""
-        query = '(list AND letters) OR (digits AND letters)'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertTrue(self.title_template.format(title='C') in result)
-        self.assertTrue('<li><p><em>c</em></p></li>' in result)
-        self.assertFalse(self.title_template.format(title='B') in result)
-        self.assertFalse(self.title_template.format(title='1') in result)
-
-        query = '(list AND letters) AND ((digits OR letters OR list) OR list)'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertTrue(self.title_template.format(title='C') in result)
-        self.assertTrue('<li><p><em>c</em></p></li>' in result)
-        self.assertFalse(self.title_template.format(title='B') in result)
-        self.assertFalse(self.title_template.format(title='1') in result)
-
-        query = 'digits OR NOT (letters AND NOT list)'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertTrue(self.title_template.format(title='1') in result)
-        self.assertTrue('<li><p><em>c</em></p></li>' in result)
-        self.assertFalse(self.title_template.format(title='A') in result)
-        self.assertFalse(self.title_template.format(title='D') in result)
-
-        query = '(list AND letters) AND ((digits OR letters OR list) OR lists)'
-        response = self.app.post('/query', data={'query': query})
-        result = response.data.decode('utf-8')
-        self.assertTrue('<h2>Запрос не может быть обработан</h2>' in result)
+TITLE_TEMPLATE = '<h2><a href="http://localhost/{domain}/notes/{title}">{title}</a></h2>'
 
 
-def main():
-    """Run tests."""
-    test_loader = unittest.TestLoader()
-    suites_list = []
-    testers = [
-        TestViews()
+def test_root_page(test_client: flask.testing.FlaskClient) -> None:
+    """Test root page."""
+    result = test_client.get('/').data.decode('utf-8')
+    assert "Digits & Letters" in result
+    assert "lorem_ipsum" in result
+    assert "?" in result
+
+
+def test_info_page(test_client: flask.testing.FlaskClient) -> None:
+    """Test page with info about the project."""
+    result = test_client.get('/about').data.decode('utf-8')
+    assert "ReadingBricks - О проекте" in result
+    assert "/" in result
+
+
+@pytest.mark.parametrize(
+    "domain, included_patterns",
+    [
+        ("digits_and_letters", ["letters (4)", "digits (2)", "list (1)"]),
+        ("lorem_ipsum", ["lorem_ipsum (1)", "tag"]),
     ]
-    for tester in testers:
-        suite = test_loader.loadTestsFromModule(tester)
-        suites_list.append(suite)
-    overall_suite = unittest.TestSuite(suites_list)
-    unittest.TextTestRunner().run(overall_suite)
+)
+def test_domain_page(
+        test_client: flask.testing.FlaskClient, domain: str, included_patterns: list[str]
+) -> None:
+    """Test domain page."""
+    result = test_client.get(f"/{domain}").data.decode('utf-8')
+    assert "/" in result
+    assert "?" in result
+    for pattern in included_patterns:
+        assert pattern in result
 
 
-if __name__ == '__main__':
-    main()
+@pytest.mark.parametrize(
+    "url",
+    [
+        "/non_existing",
+        "/digits_and_letters/notes",
+        "/digits_and_letters/tags",
+        "/digits_and_letters/nots/1",
+        "/digits_and_letters/notes/5",
+        "/digits_and_letters/tags/alphanumeric",
+    ]
+)
+def test_page_not_found(test_client: flask.testing.FlaskClient, url: str) -> None:
+    """Test that a placeholder page is rendered if invalid URL is entered."""
+    response = test_client.get(url)
+    result = response.data.decode('utf-8')
+    status_code = response.status_code
+    assert '<title>Страница не найдена</title>' in result
+    assert status_code == 404
+
+
+@pytest.mark.parametrize(
+    "url, included_patterns, absent_patterns",
+    [
+        (
+            # `url`
+            "/digits_and_letters/notes/C",
+            # `included_patterns`
+            [
+                "C:",
+                "<li><p><em>c</em></p></li>",
+                "<li><p>\\(c\\)</p></li>",
+                '<a href="http://localhost/digits_and_letters/notes/B">link</a>',
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+            ],
+        ),
+    ]
+)
+def test_note_page(
+        test_client: flask.testing.FlaskClient,
+        url: str,
+        included_patterns: list[str],
+        absent_patterns: list[str]
+) -> None:
+    """Test page with a single note."""
+    result = test_client.get(url).data.decode('utf-8')
+    assert "/" in result
+    assert "⌂" in result
+    assert "?" in result
+    for pattern in included_patterns:
+        assert pattern in result
+    for pattern in absent_patterns:
+        assert pattern not in result
+
+
+@pytest.mark.parametrize(
+    "url, included_patterns, absent_patterns",
+    [
+        (
+            # `url`
+            "/digits_and_letters/tags/digits",
+            # `included_patterns`
+            [TITLE_TEMPLATE.format(domain='digits_and_letters', title='1')],
+            # `absent_patterns`
+            [TITLE_TEMPLATE.format(domain='digits_and_letters', title='C')],
+        ),
+        (
+            # `url`
+            "/digits_and_letters/tags/list",
+            # `included_patterns`
+            [TITLE_TEMPLATE.format(domain='digits_and_letters', title='C')],
+            # `absent_patterns`
+            [TITLE_TEMPLATE.format(domain='digits_and_letters', title='B')],
+        ),
+    ]
+)
+def test_tag_page(
+        test_client: flask.testing.FlaskClient,
+        url: str,
+        included_patterns: list[str],
+        absent_patterns: list[str]
+) -> None:
+    """Test page with all notes tagged with a specified tag."""
+    result = test_client.get(url).data.decode('utf-8')
+    assert "/" in result
+    assert "⌂" in result
+    assert "?" in result
+    for pattern in included_patterns:
+        assert pattern in result
+    for pattern in absent_patterns:
+        assert pattern not in result
+
+
+@pytest.mark.parametrize(
+    "domain, query, included_patterns, absent_patterns",
+    [
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "list AND letters",
+            # `included_patterns`
+            [
+                'C', '<li><p><em>c</em></p></li>', '<li><p>\\(c\\)</p></li>'
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1')
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "list AND digits",
+            # `included_patterns`
+            [
+                "<h2>Ничего не найдено</h2>"
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='B')
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "list OR letters",
+            # `included_patterns`
+            [
+                '<li><p><em>c</em></p></li>',
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1')
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "list OR digits",
+            # `included_patterns`
+            [
+                '<li><p><em>c</em></p></li>',
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A')
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "NOT list",
+            # `included_patterns`
+            [
+                '<p>1</p>',
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C')
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "NOT letters",
+            # `included_patterns`
+            [
+                '<p>2</p>',
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A')
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "(list AND letters) OR (digits AND letters)",
+            # `included_patterns`
+            [
+                '<li><p><em>c</em></p></li>',
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='B'),
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "(list AND letters) AND ((digits OR letters OR list) OR list)",
+            # `included_patterns`
+            [
+                '<li><p><em>c</em></p></li>',
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='B'),
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "digits OR NOT (letters AND NOT list)",
+            # `included_patterns`
+            [
+                '<li><p><em>c</em></p></li>',
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='1'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='D'),
+            ],
+        ),
+        (
+            # `domain`
+            "digits_and_letters",
+            # `query`
+            "(list AND letters) AND ((digits OR letters OR list) OR lists)",
+            # `included_patterns`
+            [
+                '<h2>Запрос не может быть обработан</h2>',
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='A'),
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='B'),
+                TITLE_TEMPLATE.format(domain='digits_and_letters', title='C'),
+            ],
+        ),
+    ]
+)
+def test_tag_query_page(
+        test_client: flask.testing.FlaskClient,
+        domain: str,
+        query: str,
+        included_patterns: list[str],
+        absent_patterns: list[str]
+) -> None:
+    """Test page with results of search by tags."""
+    result = test_client.post(f'/{domain}/query', data={'query': query}).data.decode('utf-8')
+    assert "/" in result
+    assert "⌂" in result
+    assert "?" in result
+    for pattern in included_patterns:
+        assert pattern in result
+    for pattern in absent_patterns:
+        assert pattern not in result
