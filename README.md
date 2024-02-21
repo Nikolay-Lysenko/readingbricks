@@ -4,59 +4,50 @@
 
 # ReadingBricks
 
-## What is it?
+## Overview
 
-It is a structured collection of tagged notes about machine learning theory and practice (now, in Russian only). Each note is independent of the others, but some of them require familiarity with core concepts and definitions.
+It is a Flask app for reading and searching notes from a personal knowledge base. Here, knowledge base means a collection of Jupyter notebooks with Markdown cells which may have tags and may contain links to each other. So, the approach resembles [Zettelkasten](https://en.wikipedia.org/wiki/Zettelkasten).
 
-Two key parts of the repository are as follows:
-* The notes itself, all of them are written specially for this project;
-* Search system.
-
-Currently, there are less than 100 notes and so there is no need in complicated search system. However, an outline of its evolution is created. Planned features of the search system are as follows:
+Features of the search system include:
+- [x] Separate spaces for fields of knowledge
 - [x] Search by single tag
-- [x] Logical operators
-- [ ] Support of tags hierarchy
-- [ ] Full-text search
-- [ ] Ranking based on flexible parameters
-- [ ] On-demand making of customized texts from notes 
+- [x] Search by expressions consisting of tags, logical operators, and parenthesis
+- [ ] Full-text search with TF-IDF
+- [ ] Search within kNN-index built on vector representations of notes
 
-## How to use it?
+The repository can be used either as a whole (with notes written by me) or as a Python package providing an interface to your notes.
 
-The search system has Flask-based interface. To use this interface, you need to clone the repository to your local machine and install `readingbricks` package. For example, you can do so by running these commands from a terminal:
-```
+## Usage as existing knowledge base
+
+The most valuable part of this project is not a software. It is the [notes](https://github.com/Nikolay-Lysenko/readingbricks/tree/master/notes) itself. When writing them, I try to explain complicated things in a way that allows efficient grasping with as less ambiguity as possible. I write mostly on machine learning, but new topics are coming. Alas, there is a potential dealbreaker — as of now, notes are in Russian only. If it does not suit you, please go to the next section.
+
+To start with, you need to clone the repository to your local machine and install `readingbricks` package. This can be done by running these commands from a terminal:
+```bash
 cd /your/path/
 git clone https://github.com/Nikolay-Lysenko/readingbricks
 cd readingbricks
 make venv
 ```
 
-Every time you want to start a Flask application, do the following:
-```
+Every time you want to start a Flask application, run the below commands:
+```bash
 cd /your/path/readingbricks
 source venv/bin/activate
-python run_app_locally.py
+python -m readingbricks
 ```
 
-The last command launches a local server. After it is ready, open your web browser and go to `127.0.0.1:5000`.
+The last command launches a local server. After it is ready, open your web browser and go to `127.0.0.1:5000`. See [interface guide](#interface-guide) section for further details.
 
-The web interface is quite self-explanatory. There are two elements at the index page:
+## Usage as an interface
+
+Coming soon.
+
+## Interface guide
+
+The web interface is quite self-explanatory. At the index page, there is field selection. Home page of each field has two control elements:
 * search bar,
 * cloud of tags.
 
 You can look through the tag cloud and choose the tags you are interested in. If you are interested in a single tag, just push a button with it. However, if you need less trivial selection of notes, search bar should be used. Arbitrary logical expressions with AND, OR, and NOT operators and parentheses are supported there. 
 
 Enjoy reading!
-
-## How to contribute?
-
-Everyone can create a pull request.
-
-Note that it is strongly recommended to update counts of tags automatically. This is easy — just copy and rename files from `supplementaries/hooks` directory according to instructions that are placed inside of them right below shebang. If it is done correctly, Git hooks will refresh tag statistics and other necessary files for you. Also they will validate your notes and check code style.
-
-When working on a pull request, keep in mind internal structure of the project. It is assumed that there are three types of files:
-* Notes written by humans. All of them must be inside `notes` directory in `ipynb` format;
-* Automatically created files. They never should be updated manually and most of them are in `.gitignore`;
-* Infrastructure code. It can be stored at these locations:
-    - `readingbricks` (Flask-based interface),
-    - `supplementaries/hooks` (Git hooks),
-    - `tests` (tests for continuous integration).
