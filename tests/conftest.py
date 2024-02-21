@@ -28,6 +28,7 @@ def resources() -> None:
 @pytest.fixture(scope='module')
 def test_client() -> flask.testing.FlaskClient:
     """Provide test client to Flask app."""
+    app.testing = True
     app.config["FIELDS"] = ["digits_and_letters", "lorem_ipsum"]
     app.config["FIELD_TO_ALIAS"] = {"digits_and_letters": "Digits & Letters"}
     app.config["FIELD_TO_SEARCH_PROMPT"] = {"digits_and_letters": "digits"}
