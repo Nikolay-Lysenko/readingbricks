@@ -1,6 +1,7 @@
 [![Build Status](https://github.com/Nikolay-Lysenko/readingbricks/actions/workflows/main.yml/badge.svg)](https://github.com/Nikolay-Lysenko/readingbricks/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/Nikolay-Lysenko/readingbricks/branch/master/graph/badge.svg)](https://codecov.io/gh/Nikolay-Lysenko/readingbricks)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ac3959677909d81cb271/maintainability)](https://codeclimate.com/github/Nikolay-Lysenko/readingbricks/maintainability)
+[![PyPI version](https://badge.fury.io/py/readingbricks.svg)](https://pypi.org/project/readingbricks/)
 
 # ReadingBricks
 
@@ -19,9 +20,9 @@ The repository can be used either as a whole (with notes written by me) or as a 
 
 ## Usage as existing knowledge base
 
-The most valuable part of this project is not a software. It is the [notes](https://github.com/Nikolay-Lysenko/readingbricks/tree/master/notes) itself. When writing them, I try to explain complicated things in a way that allows efficient grasping with as less ambiguity as possible. I write mostly on machine learning, but new topics are coming. Alas, there is a potential dealbreaker — as of now, notes are in Russian only. If it does not suit you, please go to the next section.
+The most valuable part of this project is not a software. It is the [notes](https://github.com/Nikolay-Lysenko/readingbricks/tree/master/notes) itself. When writing them, I try to explain complicated things in a way that allows efficient grasping with as less ambiguity as possible. I write mostly on machine learning, but new topics are coming. Alas, there is a potential dealbreaker — as of now, notes are in Russian only. If it does not suit you, please go to the [next section](#usage-as-an-interface).
 
-To start with, you need to clone the repository to your local machine and install `readingbricks` package. This can be done by running these commands from a terminal:
+To start with, you need to clone the repository to your local machine and install `readingbricks` package. This can be done by running the below commands from a terminal:
 ```bash
 cd /your/path/
 git clone https://github.com/Nikolay-Lysenko/readingbricks
@@ -29,7 +30,7 @@ cd readingbricks
 make venv
 ```
 
-Every time you want to start a Flask application, run the below commands:
+Every time you want to start a Flask application, run these commands:
 ```bash
 cd /your/path/readingbricks
 source venv/bin/activate
@@ -40,11 +41,48 @@ The last command launches a local server. After it is ready, open your web brows
 
 ## Usage as an interface
 
-Coming soon.
+To make your own knowledge base compatible with the app, it must be represented as follows:
+```
+notes_directory
+├── field_one
+│   ├── notebook_one.ipynb
+│   ├── ...
+│   └── notebook_n.ipynb
+├── ...
+└── field_k
+    ├── notebook_one.ipynb
+    ├── ...
+    └── notebook_m.ipynb
+```
+Here, fields stand for independent domains (say, machine learning, chemistry, music theory, etc). Within a particular field, distribution of notes between Jupyter notebooks can be arbitrary. For example, you may simply keep all notes inside a single notebook.
+
+All cells of a notebook must be Markdown cells starting with '## {title}'. To tag a note, activate tagging facilities with 'View -> Cell Toolbar -> Tags'. To add link from one note to an other note, special patterns `__home_url__/notes/{note_title}` and `__root_url__/{field}/notes/{note_title}` can be used. 
+
+So far so good. The app must be configured to work with the knowledge base. Create somewhere a JSON file that looks like this:
+```json
+{
+  "FIELDS": ["filed_one", "field_two"],
+  "FIELD_TO_ALIAS": {"field_one": "Field #1", "field_two":  "Field #2"},
+  "FIELD_TO_SEARCH_PROMPT": {"field_one": "the_most_popular_tag", "filed_two": "the_most_popular_tag"},
+  "NOTES_DIR": "/path/to/notes_directory",
+  "RESOURCES_DIR": "/any/directory/for/storing/internal/files"
+}
+```
+
+Now, let us install the Python package:
+```bash
+source /your/path/venv/bin/activate
+pip install readingbricks
+```
+
+All that remains is to launch the app:
+```bash
+python -m readingbriks -c /absolute/path/to/config.json
+```
 
 ## Interface guide
 
-The web interface is quite self-explanatory. At the index page, there is field selection. Home page of each field has two control elements:
+The web interface is quite self-explanatory. At the index page, there are buttons for field selection. Home page of each field has two control elements:
 * search bar,
 * cloud of tags.
 
