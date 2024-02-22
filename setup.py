@@ -17,15 +17,16 @@ with open(os.path.join(current_dir, 'README.md'), encoding='utf-8') as f:
 setup(
     name='readingbricks',
     version='0.1.0',
-    description='Flask app for searching through tagged Jupyter cells',
+    description='Flask app for reading and searching notes from a personal knowledge base',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/Nikolay-Lysenko/readingbricks',
     author='Nikolay Lysenko',
     author_email='nikolay-lysenco@yandex.ru',
     license='MIT',
-    keywords='machine_learning lecture_notes search_engine',
-    packages=find_packages(exclude=['notes', 'tests', 'supplementaries']),
-    include_package_data=True,  # For CSS files and so on.
+    keywords='knowledge_base lecture_notes search_engine zettelkasten',
+    packages=find_packages(exclude=['git_hooks', 'notes', 'tests']),
+    package_data={"readingbricks": ["*.css", "*.html", "*.png"]},
     python_requires='>=3.6',
     install_requires=[
         'Flask',
@@ -33,5 +34,13 @@ setup(
         'Flask-Misaka',
         'pyparsing',
         'python-markdown-math'
+    ],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Education',
+        'Intended Audience :: End Users/Desktop',
+        'Topic :: Education',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3'
     ]
 )
