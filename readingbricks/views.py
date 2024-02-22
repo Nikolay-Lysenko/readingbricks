@@ -38,8 +38,8 @@ def index() -> RESPONSE_TYPE:
         link = f'<div>{link}</div>\n'
         links_to_fields.append(link)
     fields_cloud = Markup(''.join(links_to_fields))
-    content_with_css = render_template('index.html', **locals())
-    return content_with_css
+    contents_with_css = render_template('index.html', **locals())
+    return contents_with_css
 
 
 @app.route('/about')
@@ -71,8 +71,8 @@ def field(field_name: str) -> RESPONSE_TYPE:
     ]
     tags_cloud = Markup(''.join(links_to_tags))
 
-    content_with_css = render_template('field.html', **locals())
-    return content_with_css
+    contents_with_css = render_template('field.html', **locals())
+    return contents_with_css
 
 
 def make_link_from_title(md_title: str, field_name: str) -> str:
@@ -81,6 +81,8 @@ def make_link_from_title(md_title: str, field_name: str) -> str:
 
     The process can be illustrated in the following way:
     '## Title' -> '## [Title](URL)'
+
+    As a result, it becomes possible to get permalink to a note found in search results.
     """
     note_title = md_title.lstrip('# ').rstrip('\n')
     home_url = url_for('index', _external=True)
@@ -88,16 +90,19 @@ def make_link_from_title(md_title: str, field_name: str) -> str:
     return result
 
 
-def activate_cross_links(content_in_markdown: str, field_name: str) -> str:
+def activate_cross_links(contents_in_markdown: str, field_name: str) -> str:
     """
     Make links to other notes valid.
 
-    Substring '__home_url__' is reserved for link to the field home page
-    and here this substring is replaced with actual URL.
+    Substring '__root_url__' is reserved for link to the index page,
+    substring '__home_url__' is reserved for link to the field home page,
+    and here these substrings are replaced with actual URLs.
     """
+    root_url = url_for('index', _external=True)
+    contents_in_markdown = contents_in_markdown.replace('__root_url__', root_url)
     home_url = url_for('index', _external=True) + field_name
-    content_in_markdown = content_in_markdown.replace('__home_url__', home_url)
-    return content_in_markdown
+    contents_in_markdown = contents_in_markdown.replace('__home_url__', home_url)
+    return contents_in_markdown
 
 
 def convert_note_from_markdown_to_html(field_name: str, note_id: str) -> Optional[Markup]:
@@ -115,13 +120,13 @@ def convert_note_from_markdown_to_html(field_name: str, note_id: str) -> Optiona
     with open(abs_requested_path, 'r') as source_file:
         md_title = source_file.readline()
         md_title_as_link = make_link_from_title(md_title, field_name)
-        content_in_markdown = md_title_as_link + source_file.read()
-    content_in_markdown = activate_cross_links(content_in_markdown, field_name)
-    content_in_html = markdown_preprocessor.render(
-        content_in_markdown,
+        contents_in_markdown = md_title_as_link + source_file.read()
+    contents_in_markdown = activate_cross_links(contents_in_markdown, field_name)
+    contents_in_html = markdown_preprocessor.render(
+        contents_in_markdown,
         math=True, math_explicit=True, no_intra_emphasis=True
     )
-    return content_in_html
+    return contents_in_html
 
 
 @app.route('/<field_name>/notes/<note_title>')
@@ -129,25 +134,31 @@ def page_with_note(field_name: str, note_title: str) -> RESPONSE_TYPE:
     """Render in HTML a page with exactly one note."""
     field_url = url_for('field', field_name=field_name)
     note_id = compress(note_title)
-    content_in_html = convert_note_from_markdown_to_html(field_name, note_id)
-    if content_in_html is None:
+    contents_in_html = convert_note_from_markdown_to_html(field_name, note_id)
+    if contents_in_html is None:
         return render_template('404.html'), 404
     page_title = note_title
-    content_with_css = render_template('regular_page.html', **locals())
-    content_with_css = content_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
-    return content_with_css
+    contents_with_css = render_template('regular_page.html', **locals())
+    contents_with_css = contents_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
+    return contents_with_css
 
 
 def page_for_list_of_ids(field_name: str, page_title: str, note_ids: list[str]) -> RESPONSE_TYPE:
     """Render in HTML a page with all notes from the specified list."""
     field_url = url_for('field', field_name=field_name)
-    notes_content = []
+    notes_contents = []
     for note_id in note_ids:
-        notes_content.append(convert_note_from_markdown_to_html(field_name, note_id))
-    content_in_html = reduce(lambda x, y: x + y, notes_content)
-    content_with_css = render_template('regular_page.html', **locals())
-    content_with_css = content_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
-    return content_with_css
+        notes_contents.append(convert_note_from_markdown_to_html(field_name, note_id))
+    contents_in_html = reduce(lambda x, y: x + y, notes_contents)
+
+    if len(note_ids) > 1:
+        table_of_contents = ''
+        for note_content in notes_contents:
+            table_of_contents += note_content.split('\n')[0].replace('h2', 'p') + '\n'
+
+    contents_with_css = render_template('regular_page.html', **locals())
+    contents_with_css = contents_with_css.replace('</p>\n\n<ul>', '</p>\n<ul>')
+    return contents_with_css
 
 
 @app.route('/<field_name>/tags/<tag>')
@@ -165,8 +176,8 @@ def page_for_tag(field_name: str, tag: str) -> RESPONSE_TYPE:
     except sqlite3.OperationalError:
         return render_template('404.html'), 404
     page_title = (tag[0].upper() + tag[1:]).replace('_', ' ')
-    content_with_css = page_for_list_of_ids(field_name, page_title, note_ids)
-    return content_with_css
+    contents_with_css = page_for_list_of_ids(field_name, page_title, note_ids)
+    return contents_with_css
 
 
 @app.route('/<field_name>/query', methods=['POST'])
@@ -192,10 +203,10 @@ def page_for_query(field_name: str) -> RESPONSE_TYPE:
         return render_template('invalid_query.html', **locals())
 
     if len(note_ids) > 0:
-        content_with_css = page_for_list_of_ids(field_name, user_query, note_ids)
+        contents_with_css = page_for_list_of_ids(field_name, user_query, note_ids)
     else:
-        content_with_css = render_template('empty_result.html', **locals())
-    return content_with_css
+        contents_with_css = render_template('empty_result.html', **locals())
+    return contents_with_css
 
 
 @app.errorhandler(404)

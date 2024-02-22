@@ -81,6 +81,7 @@ def test_page_not_found(test_client: flask.testing.FlaskClient, url: str) -> Non
             ],
             # `absent_patterns`
             [
+                '<div id="table_of_contents">',
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
             ],
         ),
@@ -110,17 +111,27 @@ def test_note_page(
             # `url`
             "/digits_and_letters/tags/digits",
             # `included_patterns`
-            [TITLE_TEMPLATE.format(field='digits_and_letters', title='1')],
+            [
+                '<div id="table_of_contents">',
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='1')
+            ],
             # `absent_patterns`
-            [TITLE_TEMPLATE.format(field='digits_and_letters', title='C')],
+            [
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='C')
+            ],
         ),
         (
             # `url`
             "/digits_and_letters/tags/list",
             # `included_patterns`
-            [TITLE_TEMPLATE.format(field='digits_and_letters', title='C')],
+            [
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='C')
+            ],
             # `absent_patterns`
-            [TITLE_TEMPLATE.format(field='digits_and_letters', title='B')],
+            [
+                '<div id="table_of_contents">',
+                TITLE_TEMPLATE.format(field='digits_and_letters', title='B')
+            ],
         ),
     ]
 )
@@ -155,6 +166,7 @@ def test_tag_page(
             ],
             # `absent_patterns`
             [
+                '<div id="table_of_contents">',
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='1')
             ],
         ),
@@ -169,6 +181,7 @@ def test_tag_page(
             ],
             # `absent_patterns`
             [
+                '<div id="table_of_contents">',
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='B')
             ],
         ),
@@ -180,6 +193,7 @@ def test_tag_page(
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
+                '<div id="table_of_contents">',
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
             ],
             # `absent_patterns`
@@ -195,6 +209,7 @@ def test_tag_page(
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
+                '<div id="table_of_contents">',
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='1'),
             ],
             # `absent_patterns`
@@ -210,6 +225,7 @@ def test_tag_page(
             # `included_patterns`
             [
                 '<p>1</p>',
+                '<div id="table_of_contents">',
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
             ],
             # `absent_patterns`
@@ -244,6 +260,7 @@ def test_tag_page(
             ],
             # `absent_patterns`
             [
+                '<div id="table_of_contents">',
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='A'),
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='B'),
                 TITLE_TEMPLATE.format(field='digits_and_letters', title='1'),

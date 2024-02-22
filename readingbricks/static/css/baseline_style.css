@@ -81,7 +81,14 @@ h2 a:link, h2 a:visited {
     width: 50%;
     text-align: center;
 }
-#content {
+#table_of_contents {
+    margin: auto;
+    padding-top: 1%;
+    padding-bottom: 2%;
+    width: 85%;
+    max-width: 900px;
+}
+#contents {
     margin: auto;
     padding-top: 1%;
     padding-bottom: 1%;
@@ -96,7 +103,7 @@ h2 a:link, h2 a:visited {
 }
 #fields_cloud {
     margin: auto;
-    margin-top: 15%;
+    margin-top: 20%;
     text-align: center;
     padding-bottom: 1%;
     width: 95%;
