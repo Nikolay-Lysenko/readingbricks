@@ -2,6 +2,7 @@
 branch = True
 source = readingbricks
 omit =
+    */__main__.py
     readingbricks/app_for_server.py
 
 [report]
