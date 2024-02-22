@@ -18,7 +18,15 @@
         <nav id="frozen_button_two"><a href="{{ field_url }}" class="button">⌂</a></nav>
         <nav id="frozen_button_three"><a href="{{ url_for('about') }}" class="button">?</a></nav>
         <div id="central">
-            <div id="content">{{ content_in_html }}</div>
+            <div id="contents">
+                {% if table_of_contents is defined %}
+                <div id="table_of_contents">
+                    <h2>Содержание</h2>
+                    {{ table_of_contents }}
+                </div>
+                {% endif %}
+                {{ contents_in_html }}
+            </div>
         </div>
     </body>
 </html>
