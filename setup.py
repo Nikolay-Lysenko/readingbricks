@@ -16,7 +16,7 @@ with open(os.path.join(current_dir, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='readingbricks',
-    version='0.1.0',
+    version='0.1.1',
     description='Flask app for reading and searching notes from a personal knowledge base',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -27,7 +27,8 @@ setup(
     keywords='knowledge_base lecture_notes search_engine zettelkasten',
     packages=find_namespace_packages(exclude=['git_hooks', 'notes', 'tests']),
     package_data={
-        "readingbricks.static": ["*.css", "*.png"],
+        "readingbricks.static.css": ["*.css"],
+        "readingbricks.static.images": ["*.png"],
         "readingbricks.templates": ["*.html"]
     },
     python_requires='>=3.6',
