@@ -6,7 +6,7 @@ Author: Nikolay Lysenko
 
 
 import os
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -25,8 +25,11 @@ setup(
     author_email='nikolay-lysenco@yandex.ru',
     license='MIT',
     keywords='knowledge_base lecture_notes search_engine zettelkasten',
-    packages=find_packages(exclude=['git_hooks', 'notes', 'tests']),
-    package_data={"readingbricks": ["*.css", "*.html", "*.png"]},
+    packages=find_namespace_packages(exclude=['git_hooks', 'notes', 'tests']),
+    package_data={
+        "readingbricks.static": ["*.css", "*.png"],
+        "readingbricks.templates": ["*.html"]
+    },
     python_requires='>=3.6',
     install_requires=[
         'Flask',
