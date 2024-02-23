@@ -1,0 +1,1 @@
+The file is added in order to add its directory to the repository. This directory is needed to test that directories having names starting with '.', are ignored.

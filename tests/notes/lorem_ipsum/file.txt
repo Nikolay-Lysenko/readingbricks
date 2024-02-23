@@ -1,0 +1,1 @@
+This file is added in order to test that files without `ipynb` extension are ignored.
