@@ -11,18 +11,25 @@ Author: Nikolay Lysenko
 
 import os
 import sqlite3
-from collections import defaultdict
+from collections import Counter, defaultdict
 from contextlib import closing
+from math import log
+from nltk.stem.snowball import SnowballStemmer
 from typing import Any
 
 from readingbricks.constants import (
-    NOTES_DIR,
-    RESOURCES_DIR,
+    LANGUAGES_FOR_STEMMER,
     MARKDOWN_DIR_NAME,
     TAG_COUNTS_FILE_NAME,
     TAG_TO_NOTES_DB_FILE_NAME,
+    TF_IDF_DB_FILE_NAME
 )
-from readingbricks.utils import compress, extract_cells, open_transaction
+from readingbricks.default_settings import (
+    LANGUAGE,
+    NOTES_DIR,
+    RESOURCES_DIR,
+)
+from readingbricks.utils import compress, extract_cells, open_transaction, standardize_string
 
 
 class MarkdownNotesMaker:
@@ -55,33 +62,33 @@ class MarkdownNotesMaker:
                 os.unlink(file_name)
 
     @staticmethod
-    def __insert_blank_line_before_each_list(content: list[str]) -> list[str]:
+    def __insert_blank_line_before_each_list(contents: list[str]) -> list[str]:
         """Insert blank line before each Markdown list when it is needed by Misaka parser."""
         list_markers = ['* ', '- ', '+ ', '1. ']
         result = []
-        for first, second in zip(content, content[1:]):
+        for first, second in zip(contents, contents[1:]):
             result.append(first)
             if any([second.startswith(x) for x in list_markers]) and first:
                 result.append('')
-        result.append(content[-1])
+        result.append(contents[-1])
         return result
 
-    def copy_cell_content_to_markdown_file(self, cell: dict[str, Any]) -> None:
+    def copy_cell_contents_to_markdown_file(self, cell: dict[str, Any]) -> None:
         """
-        Extract content of the cell and save it as Markdown file in the specified directory.
+        Extract contents of the cell and save it as Markdown file in the specified directory.
 
         :param cell:
             Jupyter notebook cell to be processed
         :return:
             None
         """
-        content = [line.rstrip('\n') for line in cell['source']]
-        content = self.__insert_blank_line_before_each_list(content)
-        note_title = content[0].lstrip('# ')
+        contents = [line.rstrip('\n') for line in cell['source']]
+        contents = self.__insert_blank_line_before_each_list(contents)
+        note_title = contents[0].lstrip('# ')
         file_name = compress(note_title)
         file_path = os.path.join(self.__path_to_markdown_notes, file_name) + '.md'
         with open(file_path, 'w') as destination_file:
-            for line in content:  # pragma: no branch
+            for line in contents:  # pragma: no branch
                 destination_file.write(line + '\n')
 
 
@@ -144,7 +151,7 @@ class TagToNotesDatabaseMaker:
     def __init__(self, path_to_db: str):
         """Initialize an instance."""
         self.__path_to_db = path_to_db
-        self.__tag_to_title_hashes = defaultdict(lambda: [])
+        self.__tag_to_title_hashes = defaultdict(list)
         self.__title_hash_to_precedence = {}
 
     def update_mappings(self, cell: dict[str, Any], precedence: int) -> None:
@@ -190,11 +197,12 @@ class TagToNotesDatabaseMaker:
                     cursor.execute(
                         f"DELETE FROM {k}"
                     )
-                    for hashed_title in v:
+                    for title_hash in v:
                         cursor.execute(
                             f"INSERT INTO {k} (title_hash) VALUES (?)",
-                            (hashed_title,)
+                            (title_hash,)
                         )
+
                 cursor.execute(
                     "CREATE TABLE IF NOT EXISTS precedences (title_hash VARCHAR, precedence INT)"
                 )
@@ -210,6 +218,93 @@ class TagToNotesDatabaseMaker:
                         "INSERT INTO precedences (title_hash, precedence) VALUES (?, ?)",
                         (k, v)
                     )
+
+            with closing(connection.cursor()) as cursor:
+                cursor.execute('VACUUM')
+
+
+class TfIdfDatabaseMaker:
+    """
+    Maker of SQLite database with statistics involved in TF-IDF calculation.
+
+    :param path_to_db:
+        path to SQLite database;
+        if this file already exists, it will be overwritten, else the file will be created
+    :param language:
+        main language of notes
+    """
+
+    def __init__(self, path_to_db: str, language: str = 'ru'):
+        """Initialize an instance."""
+        self.__path_to_db = path_to_db
+        self.__stemmer = SnowballStemmer(LANGUAGES_FOR_STEMMER[language])
+        self.__title_hash_to_term_counts = {}
+        self.__term_to_count_of_notes = defaultdict(int)
+        self.__n_notes = 0
+
+    def update_statistics(self, cell: dict[str, Any]) -> None:
+        """
+        Update statistics on a single cell.
+
+        :param cell:
+            Jupyter notebook cell to be processed
+        :return:
+            None
+        """
+        cell_header = cell['source'][0].rstrip('\n')
+        cell_header = cell_header.lstrip('# ')
+        hashed_header = compress(cell_header)
+
+        contents = ''.join(cell['source'])
+        standardized_contents = standardize_string(contents)
+        words = standardized_contents.split()
+        terms = [self.__stemmer.stem(word) for word in words]
+
+        self.__title_hash_to_term_counts[hashed_header] = Counter(terms)
+        for term in set(terms):
+            self.__term_to_count_of_notes[term] += 1
+        self.__n_notes += 1
+
+    def write_statistics_to_db(self) -> None:
+        """
+        Create all necessary tables and indices in the target DB.
+
+        :return:
+            None
+        """
+        with closing(sqlite3.connect(self.__path_to_db)) as connection:
+            with open_transaction(connection) as cursor:
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS tf (term VARCHAR, title_hash VARCHAR, log_tf INT)"
+                )
+                cursor.execute(
+                    "CREATE INDEX IF NOT EXISTS tf_index ON tf (term)"
+                )
+                cursor.execute(
+                    "DELETE FROM tf"
+                )
+                for title_hash, counter in self.__title_hash_to_term_counts.items():
+                    for term, count in counter.items():
+                        cursor.execute(
+                            "INSERT INTO tf (term, title_hash, log_tf) VALUES (?, ?, ?)",
+                            (term, title_hash, log(1 + count))
+                        )
+
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS idf (term VARCHAR, log_idf REAL)"
+                )
+                cursor.execute(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS idf_index ON idf (term)"
+                )
+                cursor.execute(
+                    "DELETE FROM idf"
+                )
+                for term, n_notes in self.__term_to_count_of_notes.items():
+                    cursor.execute(
+                        "INSERT INTO idf (term, log_idf) VALUES (?, ?)",
+                        (term, log(self.__n_notes / n_notes))
+                    )
+
             with closing(connection.cursor()) as cursor:
                 cursor.execute('VACUUM')
 
@@ -218,7 +313,9 @@ def make_resources_for_single_field(
         ipynb_dir: str,
         markdown_dir: str,
         tag_counts_path: str,
-        tag_to_notes_db_path: str
+        tag_to_notes_db_path: str,
+        tf_idf_db_path: str,
+        stemmer_language: str
 ) -> None:
     """
     Make resources for a single directory representing a particular field of knowledge.
@@ -230,7 +327,11 @@ def make_resources_for_single_field(
     :param tag_counts_path:
         path to tag counts TSV file to be created
     :param tag_to_notes_db_path:
-        path to SQLite DB file to be created
+        path to tags SQLite DB file to be created
+    :param tf_idf_db_path:
+        path to TF-IDF SQLite DB file to be created
+    :param stemmer_language:
+        language for stemmer used in TF-IDF statistics calculation
     :return:
         None
     """
@@ -239,17 +340,20 @@ def make_resources_for_single_field(
 
     tag_counts_maker = TagCountsMaker(tag_counts_path)
     tag_to_notes_db_maker = TagToNotesDatabaseMaker(tag_to_notes_db_path)
+    tf_idf_maker = TfIdfDatabaseMaker(tf_idf_db_path, stemmer_language)
 
     for precedence, cell in enumerate(extract_cells(ipynb_dir)):
-        md_maker.copy_cell_content_to_markdown_file(cell)
+        md_maker.copy_cell_contents_to_markdown_file(cell)
         tag_counts_maker.update_tags_counts(cell)
         tag_to_notes_db_maker.update_mappings(cell, precedence)
+        tf_idf_maker.update_statistics(cell)
 
     tag_counts_maker.write_tag_counts_to_tsv_file()
     tag_to_notes_db_maker.write_mappings_to_db()
+    tf_idf_maker.write_statistics_to_db()
 
 
-def make_resources(notes_dir: str, resources_dir: str) -> None:
+def make_resources(notes_dir: str, resources_dir: str, stemmer_language: str) -> None:
     """
     Make all resources.
 
@@ -257,6 +361,8 @@ def make_resources(notes_dir: str, resources_dir: str) -> None:
         outer directory with notes in Jupyter format
     :param resources_dir:
         directory where resources are going to be created
+    :param stemmer_language:
+        language for stemmer used in TF-IDF statistics calculation
     :return:
         None
     """
@@ -270,9 +376,11 @@ def make_resources(notes_dir: str, resources_dir: str) -> None:
             nested_notes_dir,
             os.path.join(resources_dir, field, MARKDOWN_DIR_NAME),
             os.path.join(resources_dir, field, TAG_COUNTS_FILE_NAME),
-            os.path.join(resources_dir, field, TAG_TO_NOTES_DB_FILE_NAME)
+            os.path.join(resources_dir, field, TAG_TO_NOTES_DB_FILE_NAME),
+            os.path.join(resources_dir, field, TF_IDF_DB_FILE_NAME),
+            stemmer_language
         )
 
 
 if __name__ == '__main__':
-    make_resources(NOTES_DIR, RESOURCES_DIR)
+    make_resources(NOTES_DIR, RESOURCES_DIR, LANGUAGE)

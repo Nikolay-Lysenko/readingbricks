@@ -5,21 +5,8 @@ Author: Nikolay Lysenko
 """
 
 
-import os
-
-
-FIELDS = [
-    "machine_learning",
-]
-FIELD_TO_ALIAS = {
-    "machine_learning": "Машинное обучение",
-}
-FIELD_TO_SEARCH_PROMPT = {
-    "machine_learning": "нейронные_сети AND (байесовские_методы OR методы_оптимизации)",
-}
-
-NOTES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "notes"))
-RESOURCES_DIR = os.path.join(os.path.dirname(__file__), "resources")
+LANGUAGES_FOR_STEMMER = {'en': 'english', 'ru': 'russian'}
 MARKDOWN_DIR_NAME = "markdown_notes"
 TAG_COUNTS_FILE_NAME = "tag_counts.tsv"
 TAG_TO_NOTES_DB_FILE_NAME = "tag_to_notes.db"
+TF_IDF_DB_FILE_NAME = "tf_idf.db"

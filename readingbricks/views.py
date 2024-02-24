@@ -16,7 +16,7 @@ from flask_misaka import Misaka
 from markupsafe import Markup
 
 from readingbricks import app
-from readingbricks.user_query_processing import LogicalQueriesHandler
+from readingbricks.query_processing import QueriesProcessor
 from readingbricks.utils import compress
 
 
@@ -191,21 +191,26 @@ def page_for_query(field_name: str) -> RESPONSE_TYPE:
     """
     field_url = url_for('field', field_name=field_name)
 
-    user_query = request.form['query']
-    default = app.config['FIELD_TO_SEARCH_PROMPT'].get(field_name, "tag")
-    user_query = user_query or default
+    query = request.form['query']
+    default_query = app.config['FIELD_TO_SEARCH_PROMPT'].get(field_name, "")
+    query = query or default_query
 
-    path_to_db = os.path.join(
+    path_to_tag_to_notes_db = os.path.join(
         app.config.get("RESOURCES_DIR"), field_name, app.config.get("TAG_TO_NOTES_DB_FILE_NAME")
     )
-    query_handler = LogicalQueriesHandler(path_to_db)
+    path_to_tf_idf_db = os.path.join(
+        app.config.get("RESOURCES_DIR"), field_name, app.config.get("TF_IDF_DB_FILE_NAME")
+    )
+    queries_processor = QueriesProcessor(
+        path_to_tag_to_notes_db, path_to_tf_idf_db, app.config.get("LANGUAGE")
+    )
     try:
-        hashed_titles = query_handler.find_all_relevant_notes(user_query)
+        hashed_titles = queries_processor.find_notes(query)
     except sqlite3.OperationalError:
         return render_template('invalid_query.html', **locals())
 
     if len(hashed_titles) > 0:
-        contents_with_css = page_with_list_of_notes(field_name, user_query, hashed_titles)
+        contents_with_css = page_with_list_of_notes(field_name, query, hashed_titles)
     else:
         contents_with_css = render_template('empty_result.html', **locals())
     return contents_with_css
