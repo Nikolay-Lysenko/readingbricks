@@ -13,7 +13,7 @@ Features of the search system include:
 - [x] Separate spaces for fields of knowledge
 - [x] Search by single tag
 - [x] Search by expressions consisting of tags, logical operators, and parentheses
-- [ ] Full-text search with TF-IDF
+- [x] Full-text search with TF-IDF
 - [ ] Search within kNN-index built on vector representations of notes
 
 The repository can be used either as a whole (with notes written by me) or as a Python package providing an interface to your notes.
@@ -61,6 +61,7 @@ All cells of a notebook must be Markdown cells starting with '## {title}'. To ta
 So far so good. The knowledge base is ready, but the app must be configured to use it. Create somewhere a JSON file that looks like this:
 ```json
 {
+  "LANGUAGE": "en",
   "FIELDS": ["field_one", "field_two"],
   "FIELD_TO_ALIAS": {"field_one": "Field #1", "field_two": "Field #2"},
   "FIELD_TO_SEARCH_PROMPT": {"field_one": "the_most_popular_tag", "field_two": "the_most_popular_tag"},
@@ -80,16 +81,17 @@ All that remains is to launch the app:
 python -m readingbricks -c /absolute/path/to/config.json
 ```
 
-As in the previous section, go to `127.0.0.1:5000`. Known bug is that some minor interface elements are in Russian regardless of notes language. I am still seeking an elegant solution to this problem.
+As in the previous section, go to `127.0.0.1:5000`. Known bug is that some minor interface elements are in Russian regardless of notes language. I am still seeking an elegant and maintainable solution to this problem.
 
 ## Interface guide
 
 The web interface is quite self-explanatory.
 
-At the index page, you can select a filed and go to its home page. Such home pages have two control elements:
-* search bar,
-* cloud of tags.
+The only non-trivial control element is search bar which is located at home pages of fields. It can operate in three modes:
+* query in natural language (e.g., `transformers in recommender systems`),
+* query as expression consisting of tags, logical operators, and parentheses — special keyword `tags:` is required (e.g. `tags: transformers AND recommender_systems`),
+* combination of above options — symbols before `tags:` form natural query and symbols after it form tag expression (e.g., `transformers tags: recommender_systems`).
 
-You can look through the tag cloud and choose the tags you are interested in. If you are interested in a single tag, just push a button with it. However, if you need less trivial selection of notes, search bar should be used. Arbitrary logical expressions with AND, OR, and NOT operators, and parentheses are supported there. 
+If at least part of a query is in natural language, results are sorted by TF-IDF. Else, order of results depends on lexicographic positions of their notebooks within their field directory and on positions of cells within notebooks.
 
 Enjoy reading!
