@@ -32,7 +32,9 @@ def main() -> None:
     cli_args = parse_cli_args()
     if cli_args.config_path is not None:
         app.config.from_file(cli_args.config_path, load=json.load)
-    make_resources(app.config.get("NOTES_DIR"), app.config.get("RESOURCES_DIR"))
+    make_resources(
+        app.config.get("NOTES_DIR"), app.config.get("RESOURCES_DIR"), app.config.get('LANGUAGE')
+    )
     app.run(debug=True)
 
 

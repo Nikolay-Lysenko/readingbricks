@@ -7,11 +7,11 @@ Author: Nikolay Lysenko
 
 from flask import Flask
 
-from readingbricks import constants
+from readingbricks import default_settings
 
 
 app = Flask(__name__)
-app.config.from_object(constants)
+app.config.from_object(default_settings)
 
 
 # Flask requires to import `views` after `app` is set

@@ -16,25 +16,6 @@ from typing import Any, Generator
 # because this module is imported by scripts that are used in Git hooks.
 
 
-def extract_cells(path_to_dir: str) -> Generator[dict[str, Any], None, None]:
-    """
-    Walk through directory and yield cells of notebooks from there.
-
-    :param path_to_dir:
-        path to source directory with Jupyter notebooks
-    :yield:
-        cells as dictionaries
-    """
-    for file_name in sorted(os.listdir(path_to_dir)):
-        file_path = os.path.join(path_to_dir, file_name)
-        if not os.path.isfile(file_path) or not file_name.endswith('.ipynb'):
-            continue
-        with open(file_path) as source_file:
-            cells = json.load(source_file)['cells']
-            for cell in cells:  # pragma: no branch
-                yield cell
-
-
 def compress(string: str, max_length: int = 16) -> str:
     """
     Compress a string to a string of restricted length.
@@ -52,6 +33,25 @@ def compress(string: str, max_length: int = 16) -> str:
     hashed_string = hashlib.sha256(string.encode('utf-8')).hexdigest()
     result = hashed_string[:max_length]
     return result
+
+
+def extract_cells(path_to_dir: str) -> Generator[dict[str, Any], None, None]:
+    """
+    Walk through directory and yield cells of notebooks from there.
+
+    :param path_to_dir:
+        path to source directory with Jupyter notebooks
+    :yield:
+        cells as dictionaries
+    """
+    for file_name in sorted(os.listdir(path_to_dir)):
+        file_path = os.path.join(path_to_dir, file_name)
+        if not os.path.isfile(file_path) or not file_name.endswith('.ipynb'):
+            continue
+        with open(file_path) as source_file:
+            cells = json.load(source_file)['cells']
+            for cell in cells:  # pragma: no branch
+                yield cell
 
 
 @contextmanager
@@ -77,3 +77,22 @@ def open_transaction(
         cursor.execute('COMMIT')
     finally:
         cursor.close()
+
+
+def standardize_string(string: str) -> str:
+    """
+    Remove from string all special characters.
+
+    :param string:
+        string to be standardized
+    :return:
+        standardized string
+    """
+    string = string.lower()
+    empty_string_aliases = ['$', ',', '\\', '.', '"', '«', '»', ';', ':', '?', '!', '*']
+    whitespace_aliases = ['_', '-', '\n', '{', '}', '(', ')', '[', ']', '/', '  ']
+    for empty_string_alias in empty_string_aliases:
+        string = string.replace(empty_string_alias, '')
+    for whitespace_alias in whitespace_aliases:
+        string = string.replace(whitespace_alias, ' ')
+    return string
