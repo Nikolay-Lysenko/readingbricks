@@ -131,8 +131,10 @@ class TagToNotesDatabaseMaker:
     """
     Maker of SQLite database that maps a tag to a list of notes.
 
-    Every table from the output DB has the name equal to the corresponding tag
-    and stores IDs of notes in separate records.
+    Tables from the output DB have the names equal to the corresponding tags
+    and store hashed titles of notes in separate records.
+
+    Also, there is an extra table mapping hashed title to relative precedence of its note.
 
     :param path_to_db:
         path to SQLite database;
@@ -142,52 +144,72 @@ class TagToNotesDatabaseMaker:
     def __init__(self, path_to_db: str):
         """Initialize an instance."""
         self.__path_to_db = path_to_db
-        self.__tag_to_notes = defaultdict(lambda: [])
+        self.__tag_to_title_hashes = defaultdict(lambda: [])
+        self.__title_hash_to_precedence = {}
 
-    def update_mapping_of_tags_to_notes(self, cell: dict[str, Any]) -> None:
+    def update_mappings(self, cell: dict[str, Any], precedence: int) -> None:
         """
-        Add cell header to the lists corresponding to its tags.
+        Update internal mappings on a single cell.
+
+        Namely, do the following:
+        * add hashed cell header to the lists corresponding to tags of the cell;
+        * save precedence of the cell.
 
         :param cell:
             Jupyter notebook cell to be processed
+        :param precedence:
+            precedence of the cell relatively to other cells
+            (it is used on tag pages and on search results by logical queries)
         :return:
             None
         """
         cell_header = cell['source'][0].rstrip('\n')
         cell_header = cell_header.lstrip('# ')
+        hashed_header = compress(cell_header)
         cell_tags = cell['metadata']['tags'] + ['all_notes']
         for tag in cell_tags:
-            self.__tag_to_notes[tag].append(cell_header)
+            self.__tag_to_title_hashes[tag].append(hashed_header)
+        self.__title_hash_to_precedence[hashed_header] = precedence
 
-    def write_tag_to_notes_mapping_to_db(self) -> None:
+    def write_mappings_to_db(self) -> None:
         """
-        Write content of `self.tag_to_notes` to the target DB.
+        Create all necessary tables and indices in the target DB.
 
         :return:
             None
         """
         with closing(sqlite3.connect(self.__path_to_db)) as connection:
             with open_transaction(connection) as cursor:
-                for k, v in self.__tag_to_notes.items():  # pragma: no branch
+                for k, v in self.__tag_to_title_hashes.items():  # pragma: no branch
                     cursor.execute(
-                        f"CREATE TABLE IF NOT EXISTS {k} (note_id VARCHAR)"
+                        f"CREATE TABLE IF NOT EXISTS {k} (title_hash VARCHAR)"
                     )
                     cursor.execute(
-                        f"""
-                        CREATE UNIQUE INDEX IF NOT EXISTS
-                            {k}_index
-                        ON
-                            {k} (note_id)
-                        """
+                        f"CREATE UNIQUE INDEX IF NOT EXISTS {k}_index ON {k} (title_hash)"
                     )
                     cursor.execute(
                         f"DELETE FROM {k}"
                     )
-                    for note_title in v:
+                    for hashed_title in v:
                         cursor.execute(
-                            f"INSERT INTO {k} (note_id) VALUES (?)",
-                            (compress(note_title),)
+                            f"INSERT INTO {k} (title_hash) VALUES (?)",
+                            (hashed_title,)
                         )
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS precedences (title_hash VARCHAR, precedence INT)"
+                )
+                cursor.execute(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS precedences_index "
+                    "ON precedences (title_hash)"
+                )
+                cursor.execute(
+                    "DELETE FROM precedences"
+                )
+                for k, v in self.__title_hash_to_precedence.items():
+                    cursor.execute(
+                        "INSERT INTO precedences (title_hash, precedence) VALUES (?, ?)",
+                        (k, v)
+                    )
             with closing(connection.cursor()) as cursor:
                 cursor.execute('VACUUM')
 
@@ -218,13 +240,13 @@ def make_resources_for_single_field(
     tag_counts_maker = TagCountsMaker(tag_counts_path)
     tag_to_notes_db_maker = TagToNotesDatabaseMaker(tag_to_notes_db_path)
 
-    for cell in extract_cells(ipynb_dir):
+    for precedence, cell in enumerate(extract_cells(ipynb_dir)):
         md_maker.copy_cell_content_to_markdown_file(cell)
         tag_counts_maker.update_tags_counts(cell)
-        tag_to_notes_db_maker.update_mapping_of_tags_to_notes(cell)
+        tag_to_notes_db_maker.update_mappings(cell, precedence)
 
     tag_counts_maker.write_tag_counts_to_tsv_file()
-    tag_to_notes_db_maker.write_tag_to_notes_mapping_to_db()
+    tag_to_notes_db_maker.write_mappings_to_db()
 
 
 def make_resources(notes_dir: str, resources_dir: str) -> None:

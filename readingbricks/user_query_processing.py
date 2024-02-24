@@ -65,7 +65,7 @@ class LogicalQueriesHandler:
             query = (
                 f'''
                 SELECT
-                    a.note_id
+                    a.title_hash
                 FROM
                     {operands[0]} a
                 '''
@@ -75,7 +75,7 @@ class LogicalQueriesHandler:
                         JOIN
                         {operand} {alias}
                         ON
-                            a.note_id = {alias}.note_id
+                            a.title_hash = {alias}.title_hash
                         '''
                         for operand, alias in operands_and_aliases[1:]
                     ]
@@ -87,7 +87,7 @@ class LogicalQueriesHandler:
                     [
                         f'''
                         SELECT
-                            note_id
+                            title_hash
                         FROM
                             {operand}
                         '''
@@ -109,7 +109,7 @@ class LogicalQueriesHandler:
                         FROM
                             {operands[0]} b
                         WHERE
-                            a.note_id = b.note_id
+                            a.title_hash = b.title_hash
                     )
                 '''
             )
@@ -136,7 +136,7 @@ class LogicalQueriesHandler:
         cur.execute(
             f'''
             CREATE UNIQUE INDEX IF NOT EXISTS
-                {tmp_table_name}_index ON {tmp_table_name} (note_id)
+                {tmp_table_name}_index ON {tmp_table_name} (title_hash)
             '''
         )
         return f"'{tmp_table_name}'"
@@ -159,14 +159,14 @@ class LogicalQueriesHandler:
 
     def find_all_relevant_notes(self, user_query: str) -> list[str]:
         """
-        Return list of notes that match the query.
+        Return list of hashed titles for notes that match the query.
 
         :param user_query:
             expression with AND, OR, and NOT operators,
             tags as operands, and parentheses. For example:
             "neural_networks AND (problem_setup OR bayesian_methods)"
         :return:
-            IDs of matching notes
+            hashed titles of matching notes
         """
         parsed_query = self.__infer_precedence(user_query)
         with contextlib.closing(sqlite3.connect(self.__path_to_db)) as connection:
@@ -174,7 +174,20 @@ class LogicalQueriesHandler:
                 while ']' in parsed_query:
                     parsed_query = self.__replace_leaf_with_tmp_table(parsed_query, cursor)
                 tmp_table_name = parsed_query.strip("'")
-                cursor.execute(f"SELECT note_id FROM {tmp_table_name}")
+                cursor.execute(
+                    f"""
+                    SELECT
+                        a.title_hash
+                    FROM
+                        {tmp_table_name} a
+                        JOIN
+                        precedences b
+                        ON
+                            a.title_hash = b.title_hash
+                    ORDER BY
+                        precedence
+                    """
+                )
                 query_result = cursor.fetchall()
-                note_ids = [x[0] for x in query_result]  # pragma: no branch
-        return note_ids
+                hashed_titles = [x[0] for x in query_result]  # pragma: no branch
+        return hashed_titles

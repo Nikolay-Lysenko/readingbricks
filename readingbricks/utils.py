@@ -35,7 +35,7 @@ def extract_cells(path_to_dir: str) -> Generator[dict[str, Any], None, None]:
                 yield cell
 
 
-def compress(string: str, max_length: int = 64) -> str:
+def compress(string: str, max_length: int = 16) -> str:
     """
     Compress a string to a string of restricted length.
 

@@ -105,7 +105,7 @@ def activate_cross_links(contents_in_markdown: str, field_name: str) -> str:
     return contents_in_markdown
 
 
-def convert_note_from_markdown_to_html(field_name: str, note_id: str) -> Optional[Markup]:
+def convert_note_from_markdown_to_html(field_name: str, hashed_title: str) -> Optional[Markup]:
     """
     Convert a Markdown file into `Markup` instance with HTML inside.
 
@@ -114,7 +114,7 @@ def convert_note_from_markdown_to_html(field_name: str, note_id: str) -> Optiona
     dir_path = os.path.join(
         app.config.get("RESOURCES_DIR"), field_name, app.config.get("MARKDOWN_DIR_NAME")
     )
-    abs_requested_path = os.path.join(dir_path, f'{note_id}.md')
+    abs_requested_path = os.path.join(dir_path, f'{hashed_title}.md')
     if not os.path.isfile(abs_requested_path):
         return None
     with open(abs_requested_path, 'r') as source_file:
@@ -133,8 +133,8 @@ def convert_note_from_markdown_to_html(field_name: str, note_id: str) -> Optiona
 def page_with_note(field_name: str, note_title: str) -> RESPONSE_TYPE:
     """Render in HTML a page with exactly one note."""
     field_url = url_for('field', field_name=field_name)
-    note_id = compress(note_title)
-    contents_in_html = convert_note_from_markdown_to_html(field_name, note_id)
+    hashed_title = compress(note_title)
+    contents_in_html = convert_note_from_markdown_to_html(field_name, hashed_title)
     if contents_in_html is None:
         return render_template('404.html'), 404
     page_title = note_title
@@ -143,15 +143,17 @@ def page_with_note(field_name: str, note_title: str) -> RESPONSE_TYPE:
     return contents_with_css
 
 
-def page_for_list_of_ids(field_name: str, page_title: str, note_ids: list[str]) -> RESPONSE_TYPE:
+def page_with_list_of_notes(
+        field_name: str, page_title: str, hashed_titles: list[str]
+) -> RESPONSE_TYPE:
     """Render in HTML a page with all notes from the specified list."""
     field_url = url_for('field', field_name=field_name)
     notes_contents = []
-    for note_id in note_ids:
-        notes_contents.append(convert_note_from_markdown_to_html(field_name, note_id))
+    for hashed_title in hashed_titles:
+        notes_contents.append(convert_note_from_markdown_to_html(field_name, hashed_title))
     contents_in_html = reduce(lambda x, y: x + y, notes_contents)
 
-    if len(note_ids) > 1:
+    if len(hashed_titles) > 1:
         table_of_contents = ''
         for note_content in notes_contents:
             table_of_contents += note_content.split('\n')[0].replace('h2', 'p') + '\n'
@@ -170,13 +172,13 @@ def page_for_tag(field_name: str, tag: str) -> RESPONSE_TYPE:
     try:
         with contextlib.closing(sqlite3.connect(path_to_db)) as connection:
             with contextlib.closing(connection.cursor()) as cursor:
-                cursor.execute(f"SELECT note_id FROM {tag}")
+                cursor.execute(f"SELECT title_hash FROM {tag}")
                 query_result = cursor.fetchall()
-        note_ids = [x[0] for x in query_result]
+        hashed_titles = [x[0] for x in query_result]
     except sqlite3.OperationalError:
         return render_template('404.html'), 404
     page_title = (tag[0].upper() + tag[1:]).replace('_', ' ')
-    contents_with_css = page_for_list_of_ids(field_name, page_title, note_ids)
+    contents_with_css = page_with_list_of_notes(field_name, page_title, hashed_titles)
     return contents_with_css
 
 
@@ -198,12 +200,12 @@ def page_for_query(field_name: str) -> RESPONSE_TYPE:
     )
     query_handler = LogicalQueriesHandler(path_to_db)
     try:
-        note_ids = query_handler.find_all_relevant_notes(user_query)
+        hashed_titles = query_handler.find_all_relevant_notes(user_query)
     except sqlite3.OperationalError:
         return render_template('invalid_query.html', **locals())
 
-    if len(note_ids) > 0:
-        contents_with_css = page_for_list_of_ids(field_name, user_query, note_ids)
+    if len(hashed_titles) > 0:
+        contents_with_css = page_with_list_of_notes(field_name, user_query, hashed_titles)
     else:
         contents_with_css = render_template('empty_result.html', **locals())
     return contents_with_css
