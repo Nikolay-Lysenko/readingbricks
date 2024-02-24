@@ -21,7 +21,12 @@ def parse_cli_args() -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(description='Flask app for reading and searching notes')
     parser.add_argument(
-        '-c', '--config_path', type=str, default=None, help='path to configuration file'
+        '-c', '--config_path', type=str, default=None,
+        help='path to configuration file'
+    )
+    parser.add_argument(
+        '-r', '--use_existing_resources', action=argparse.BooleanOptionalAction,
+        help='if this flag is passed, resources are not generated'
     )
     cli_args = parser.parse_args()
     return cli_args
@@ -32,9 +37,12 @@ def main() -> None:
     cli_args = parse_cli_args()
     if cli_args.config_path is not None:
         app.config.from_file(cli_args.config_path, load=json.load)
-    make_resources(
-        app.config.get("NOTES_DIR"), app.config.get("RESOURCES_DIR"), app.config.get('LANGUAGE')
-    )
+    if not cli_args.use_existing_resources:
+        make_resources(
+            app.config.get("NOTES_DIR"),
+            app.config.get("RESOURCES_DIR"),
+            app.config.get('LANGUAGE')
+        )
     app.run(debug=True)
 
 
