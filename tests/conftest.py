@@ -20,7 +20,7 @@ def resources() -> None:
     """Generate resources for test app."""
     notes_dir = os.path.join(os.path.dirname(__file__), "notes")
     resources_dir = os.path.join(os.path.dirname(__file__), "resources")
-    make_resources(notes_dir, resources_dir)
+    make_resources(notes_dir, resources_dir, stemmer_language='ru')
     yield
     rmtree(resources_dir)
 

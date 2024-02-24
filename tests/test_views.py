@@ -31,7 +31,7 @@ def test_info_page(test_client: flask.testing.FlaskClient) -> None:
     "field, included_patterns",
     [
         ("digits_and_letters", ["letters (4)", "digits (2)", "list (1)"]),
-        ("lorem_ipsum", ["lorem_ipsum (1)", "tag"]),
+        ("lorem_ipsum", ["lorem_ipsum (2)"]),
     ]
 )
 def test_field_page(
@@ -159,7 +159,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "list AND letters",
+            "tags: list AND letters",
             # `included_patterns`
             [
                 'C', '<li><p><em>c</em></p></li>', '<li><p>\\(c\\)</p></li>'
@@ -174,7 +174,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "list AND digits",
+            "tags: list AND digits",
             # `included_patterns`
             [
                 "<h2>Ничего не найдено</h2>"
@@ -189,7 +189,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "list OR letters",
+            "tags: list OR letters",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
@@ -205,7 +205,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "list OR digits",
+            "tags: list OR digits",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
@@ -221,7 +221,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "NOT list",
+            "tags: NOT list",
             # `included_patterns`
             [
                 '<p>1</p>',
@@ -237,7 +237,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "NOT letters",
+            "tags: NOT letters",
             # `included_patterns`
             [
                 '<p>2</p>',
@@ -252,7 +252,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "(list AND letters) OR (digits AND letters)",
+            "tags: (list AND letters) OR (digits AND letters)",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
@@ -270,7 +270,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "(list AND letters) AND ((digits OR letters OR list) OR list)",
+            "tags: (list AND letters) AND ((digits OR letters OR list) OR list)",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
@@ -287,7 +287,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "digits OR NOT (letters AND NOT list)",
+            "tags: digits OR NOT (letters AND NOT list)",
             # `included_patterns`
             [
                 '<li><p><em>c</em></p></li>',
@@ -303,7 +303,7 @@ def test_tag_page(
             # `field`
             "digits_and_letters",
             # `query`
-            "(list AND letters) AND ((digits OR letters OR list) OR lists)",
+            "tags: (list AND letters) AND ((digits OR letters OR list) OR lists)",
             # `included_patterns`
             [
                 '<h2>Запрос не может быть обработан</h2>',
@@ -325,6 +325,116 @@ def test_tag_query_page(
         absent_patterns: list[str]
 ) -> None:
     """Test page with results of search by tags."""
+    result = test_client.post(f'/{field}/query', data={'query': query}).data.decode('utf-8')
+    assert "/" in result
+    assert "⌂" in result
+    assert "?" in result
+    for pattern in included_patterns:
+        assert pattern in result
+    for pattern in absent_patterns:
+        assert pattern not in result
+
+
+@pytest.mark.parametrize(
+    "field, query, included_patterns, absent_patterns",
+    [
+        (
+            # `field`
+            "lorem_ipsum",
+            # `query`
+            "в",
+            # `included_patterns`
+            [
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='1'),
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='2'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='Lorem Ipsum'),
+                'Лорем ипсум',
+            ]
+        ),
+        (
+            # `field`
+            "lorem_ipsum",
+            # `query`
+            "разработка",
+            # `included_patterns`
+            [
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='1'),
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='2'),
+                'Lorem Ipsum',
+                'Лорем ипсум',
+            ]
+        ),
+    ]
+)
+def test_tf_idf_query_page(
+        test_client: flask.testing.FlaskClient,
+        field: str,
+        query: str,
+        included_patterns: list[str],
+        absent_patterns: list[str]
+) -> None:
+    """Test page with results of search by natural language query."""
+    result = test_client.post(f'/{field}/query', data={'query': query}).data.decode('utf-8')
+    assert "/" in result
+    assert "⌂" in result
+    assert "?" in result
+    for pattern in included_patterns:
+        assert pattern in result
+    for pattern in absent_patterns:
+        assert pattern not in result
+
+
+@pytest.mark.parametrize(
+    "field, query, included_patterns, absent_patterns",
+    [
+        (
+            # `field`
+            "lorem_ipsum",
+            # `query`
+            "это tags: рыба",
+            # `included_patterns`
+            [
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='2'),
+            ],
+            # `absent_patterns`
+            [
+                'Лорем ипсум',
+            ]
+        ),
+        (
+            # `field`
+            "lorem_ipsum",
+            # `query`
+            " tags: ",
+            # `included_patterns`
+            [
+                "<h2>Ничего не найдено</h2>",
+                '<p><span style="background-color: #f1ece8"> tags: </span></p>'
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='1'),
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='2'),
+                'Lorem Ipsum',
+                'Лорем ипсум',
+            ]
+        ),
+    ]
+)
+def test_combined_query_page(
+        test_client: flask.testing.FlaskClient,
+        field: str,
+        query: str,
+        included_patterns: list[str],
+        absent_patterns: list[str]
+) -> None:
+    """Test page with results of combined search."""
     result = test_client.post(f'/{field}/query', data={'query': query}).data.decode('utf-8')
     assert "/" in result
     assert "⌂" in result
