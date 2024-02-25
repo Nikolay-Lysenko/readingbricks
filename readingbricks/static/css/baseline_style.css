@@ -43,27 +43,41 @@ h2 a:link, h2 a:visited {
     text-decoration: none;
 }
 
+/* Buttons */
+.button {
+    background-color: #f7f7fc;
+    border: none;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+.button:link, .button:visited {
+    color: black;
+}
+
 /* Custom divisions */
 #frozen_button_one {
     position: fixed;
-    top: 2.5%;
-    left: 2.5%;
-    width: 10%;
-    text-align: left;
+    top: 25px;
+    left: 25px;
+    width: 100px;
 }
 #frozen_button_two {
     position: fixed;
-    top: 10%;
-    left: 2.5%;
-    width: 10%;
-    text-align: left;
+    top: 100px;
+    left: 25px;
+    width: 100px;
 }
 #frozen_button_three {
     position: fixed;
-    top: 17.5%;
-    left: 2.5%;
-    width: 10%;
-    text-align: left;
+    top: 175px;
+    left: 25px;
+    width: 100px;
 }
 #central {
     background-color: #f9f9f9;
@@ -91,7 +105,14 @@ h2 a:link, h2 a:visited {
 #contents {
     margin: auto;
     padding-top: 1%;
-    padding-bottom: 1%;
+    padding-bottom: 2%;
+    width: 95%;
+    max-width: 1000px;
+}
+#short_contents {
+    margin: auto;
+    padding-top: 1%;
+    padding-bottom: 5%;
     width: 95%;
     max-width: 1000px;
 }
@@ -105,6 +126,7 @@ h2 a:link, h2 a:visited {
     margin: auto;
     margin-top: 20%;
     text-align: center;
+    padding-top: 1%;
     padding-bottom: 1%;
     width: 95%;
 }
@@ -114,21 +136,4 @@ h2 a:link, h2 a:visited {
     text-align: center;
     padding-bottom: 5%;
     width: 95%;
-}
-
-/* Buttons */
-.button {
-    background-color: #f7f7fc;
-    border: none;
-    color: black;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
-.button:link, .button:visited {
-    color: black;
 }
