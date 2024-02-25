@@ -425,6 +425,24 @@ def test_tf_idf_query_page(
                 'Лорем ипсум',
             ]
         ),
+        (
+            # `field`
+            "lorem_ipsum",
+            # `query`
+            "булки tags: lorem ipsum",
+            # `included_patterns`
+            [
+                "<h2>Запрос не может быть обработан</h2>",
+                '<p><span style="background-color: #f1ece8">булки tags: lorem ipsum</span></p>'
+            ],
+            # `absent_patterns`
+            [
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='1'),
+                TITLE_TEMPLATE.format(field='lorem_ipsum', title='2'),
+                'Lorem Ipsum',
+                'Лорем ипсум',
+            ]
+        ),
     ]
 )
 def test_combined_query_page(
