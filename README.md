@@ -27,7 +27,10 @@ To start with, you need to clone the repository to your local machine and instal
 cd /your/path/
 git clone https://github.com/Nikolay-Lysenko/readingbricks
 cd readingbricks
-make venv
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
 ```
 
 Every time you want to start a Flask application, run these commands:
@@ -56,7 +59,7 @@ notes_directory
 ```
 Here, fields stand for independent domains (say, machine learning, chemistry, music theory, etc.). Within a particular field, distribution of notes among Jupyter notebooks can be arbitrary. For example, you may simply keep all notes in a single notebook.
 
-All cells of a notebook must be Markdown cells starting with '## {title}'. To tag a note, activate tagging facilities with 'View -> Cell Toolbar -> Tags'. To add link from one note to an other note, special patterns `__root_url__/{field}/notes/{note_title}` and `__home_url__/notes/{note_title}` can be used. While the latter is less verbose, only the former supports cross-field links.
+All cells of a notebook must be Markdown cells starting with `## {title}`. To tag a note, activate tagging facilities with 'View -> Cell Toolbar -> Tags'. To add link from one note to an other note, special patterns `__root_url__/{field}/notes/{note_title}` and `__home_url__/notes/{note_title}` can be used. While the latter is less verbose, only the former supports cross-field links.
 
 So far so good. The knowledge base is ready, but the app must be configured to use it. Create somewhere a JSON file that looks like this:
 ```json
@@ -88,10 +91,10 @@ As in the previous section, go to `127.0.0.1:5000`. Known bug is that some minor
 The web interface is quite self-explanatory.
 
 The only non-trivial control element is search bar which is located at home pages of fields. It can operate in three modes:
-* query in natural language (e.g., `transformers in recommender systems`),
-* query as expression consisting of tags, logical operators, and parentheses — special keyword `tags:` is required (e.g. `tags: transformers AND recommender_systems`),
-* combination of above options — symbols before `tags:` form natural query and symbols after it form tag expression (e.g., `transformers tags: recommender_systems`).
+* query in natural language (e.g., `transformers in recommender systems`);
+* query as expression consisting of tags, logical operators, and parentheses — special keyword `tags:` is required (e.g. `tags: transformers AND recommender_systems`);
+* combination of above options — symbols before `tags:` form natural language query and symbols after it form tag expression (e.g., `transformers tags: recommender_systems`).
 
-If at least part of a query is in natural language, results are sorted by TF-IDF. Else, order of results depends on lexicographic positions of their notebooks within their field directory and on positions of cells within notebooks.
+If at least part of a query is in natural language, results are sorted by TF-IDF. Else, order of results depends on lexicographic positions of their notebooks inside their field directory and on positions of cells inside notebooks.
 
 Enjoy reading!
