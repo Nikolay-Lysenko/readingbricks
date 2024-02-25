@@ -41,7 +41,7 @@ def lint() -> None:
     """Analyze code statically."""
     rel_path_to_repo_root = '../../'  # It is assumed that script is located at `.git/hooks`.
     abs_path_to_repo_root = convert_to_absolute_path(rel_path_to_repo_root)
-    result = subprocess.run('make lint', cwd=abs_path_to_repo_root, shell=True)
+    result = subprocess.run('tox -e lint', cwd=abs_path_to_repo_root, shell=True)
     return_code = result.returncode
     if return_code:
         raise ValueError('Lint target failed.')

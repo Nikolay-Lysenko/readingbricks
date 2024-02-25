@@ -5,3 +5,4 @@ flake8==7.0.0
 flake8-docstrings==1.7.0
 pytest==8.0.1
 pytest-cov==4.1.0
+tox==4.13.0
