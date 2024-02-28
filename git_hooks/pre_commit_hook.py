@@ -96,14 +96,21 @@ def validate_internal_urls(internal_urls: list[str], headers: list[str], tags: l
     headers = [x.lstrip('# ').rstrip(')') for x in headers]
     for internal_url in internal_urls:
         split_url = internal_url.split('/')
-        if split_url[0] != '__home_url__':
+        if split_url[0] == '__root_url__':
+            conditions = [
+                split_url[2] == 'notes' and split_url[3] in headers,
+                split_url[2] == 'tags' and split_url[3] in tags
+            ]
+        elif split_url[0] == '__home_url__':
+            conditions = [
+                split_url[1] == 'notes' and split_url[2] in headers,
+                split_url[1] == 'tags' and split_url[2] in tags
+            ]
+        else:
             raise ValueError(
-                f"URLs must start with either 'http' or '__home_url__', but '{internal_url}' found"
+                "URLs must start with 'http', '__root_url__', or '__home_url__', "
+                f"but '{internal_url}' found"
             )
-        conditions = [
-            split_url[1] == 'notes' and split_url[2] in headers,
-            split_url[1] == 'tags' and split_url[2] in tags
-        ]
         if not any(conditions):
             raise ValueError(f"URL '{internal_url}' points to non-existent page")
 
