@@ -7,7 +7,7 @@
 Automate pre-commit validation.
 
 As of now, this script runs the below tasks:
-1) Check code style with 'lint' target from `Makefile`;
+1) Check code style with 'lint' section of `tox.ini`;
 2) Validate note headers and tags;
 3) Validate internal links.
 
