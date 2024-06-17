@@ -73,7 +73,7 @@ tomli==2.0.1
 tox==4.13.0
 tqdm==4.66.2
 twine==5.0.0
-urllib3==2.2.1
+urllib3==2.2.2
 uWSGI==2.0.24
 virtualenv==20.25.1
 Werkzeug==3.0.1
