@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "readingbricks"
-version = "0.2.0"
+version = "0.2.1"
 description = "Flask app for reading and searching notes from a personal knowledge base"
 readme = "README.md"
 keywords = ["knowledge_base", "lecture_notes", "search_engine", "tf_idf", "zettelkasten"]
@@ -33,5 +33,5 @@ packages = ["readingbricks"]
 
 [tool.setuptools.package-data]
 "readingbricks.static.css" = ["*.css"]
-"readingbricks.static.images" = ["*.png"]
+"readingbricks.static.images.favicons" = ["*.ico", "*.png"]
 "readingbricks.templates" = ["*.html"]

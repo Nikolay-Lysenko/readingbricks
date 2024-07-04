@@ -23,7 +23,7 @@ def test_root_page(test_client: flask.testing.FlaskClient) -> None:
 def test_info_page(test_client: flask.testing.FlaskClient) -> None:
     """Test page with info about the project."""
     result = test_client.get('/about').data.decode('utf-8')
-    assert "ReadingBricks - О проекте" in result
+    assert "О проекте | ReadingBricks" in result
     assert "/" in result
 
 
@@ -61,7 +61,7 @@ def test_page_not_found(test_client: flask.testing.FlaskClient, url: str) -> Non
     response = test_client.get(url)
     result = response.data.decode('utf-8')
     status_code = response.status_code
-    assert '<title>Страница не найдена</title>' in result
+    assert '<title>Страница не найдена | ReadingBricks</title>' in result
     assert status_code == 404
 
 

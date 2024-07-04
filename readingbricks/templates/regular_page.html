@@ -1,18 +1,5 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>{{ page_title }}</title>
-        <script type="text/x-mathjax-config">
-            MathJax.Hub.Config({
-                CommonHTML: { linebreaks: { automatic: true } },
-                "HTML-CSS": { linebreaks: { automatic: true } },
-                SVG: { linebreaks: { automatic: true } }
-            });
-        </script>
-        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML"></script>
-        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/baseline_style.css') }}"/>
-        <link rel=icon type=image/png href="{{ url_for('static', filename='images/favicon.png') }}"/>
-    </head>
+    {% include 'head.html' %}
     <body>
         <nav id="frozen_button_one"><a href="{{ url_for('index') }}" class="button">/</a></nav>
         <nav id="frozen_button_two"><a href="{{ field_url }}" class="button">⌂</a></nav>

@@ -1,10 +1,5 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>ReadingBricks - Главная</title>
-        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/baseline_style.css') }}"/>
-        <link rel=icon type=image/png href="{{ url_for('static', filename='images/favicon.png') }}"/>
-    </head>
+    {% include 'head.html' %}
     <body>
         <nav id="frozen_button_one"><a href="{{ url_for('about') }}" class="button">?</a></nav>
         <div id="narrow_central">
