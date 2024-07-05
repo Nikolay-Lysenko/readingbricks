@@ -5,7 +5,11 @@
         <nav id="frozen_button_two"><a href="{{ url_for('about') }}" class="button">?</a></nav>
         <div id="central">
             <div id="short_contents">
+                {% if language == "en" %}
+                <h2>Page not found. Please check the URL.</h2>
+                {% else %}
                 <h2>Страница не найдена. Проверьте правильность написания адреса.</h2>
+                {% endif %}
             </div>
         </div>
     </body>

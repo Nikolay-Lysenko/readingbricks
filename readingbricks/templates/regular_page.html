@@ -8,7 +8,11 @@
             <div id="contents">
                 {% if table_of_contents is defined %}
                 <div id="table_of_contents">
+                    {% if language == "en" %}
+                    <h2>Contents</h2>
+                    {% else %}
                     <h2>Содержание</h2>
+                    {% endif %}
                     {{ table_of_contents }}
                 </div>
                 {% endif %}

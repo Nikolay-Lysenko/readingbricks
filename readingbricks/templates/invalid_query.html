@@ -6,10 +6,17 @@
         <nav id="frozen_button_three"><a href="{{ url_for('about') }}" class="button">?</a></nav>
         <div id="central">
             <div id="short_contents">
+                {% if language == "en" %}
+                <h2>The query can not be processed</h2>
+                <p>The below query has been entered:</p>
+                <p><span style="background-color: #f1ece8">{{ query }}</span></p>
+                <p>Please check the syntax. Only existing tags, parentheses, and logical operators (AND, OR, NOT) are allowed after <span style="background-color: #f1ece8">tags:</span> keyword. Also check spelling of tags. Probably, space is used instead of underscore.</p>
+                {% else %}
                 <h2>Запрос не может быть обработан</h2>
                 <p>Введён следующий запрос:</p>
                 <p><span style="background-color: #f1ece8">{{ query }}</span></p>
-                <p>Проверьте синтаксис — разрешены только существующие метки, круглые скобки и операторы AND, OR и NOT. Также проверьте правильность написания меток: возможно, для какой-либо метки использован пробел вместо нижнего подчёркивания.</p>
+                <p>Проверьте синтаксис — после ключевого слова <span style="background-color: #f1ece8">tags:</span> разрешены только существующие метки, круглые скобки и операторы AND, OR и NOT. Также проверьте правильность написания меток: возможно, для какой-либо метки использован пробел вместо нижнего подчёркивания.</p>
+                {% endif %}
             </div>
         </div>
     </body>

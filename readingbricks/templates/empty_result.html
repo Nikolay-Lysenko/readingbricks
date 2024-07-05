@@ -6,10 +6,17 @@
         <nav id="frozen_button_three"><a href="{{ url_for('about') }}" class="button">?</a></nav>
         <div id="central">
             <div id="short_contents">
+                {% if language == "en" %}
+                <h2>Nothing found</h2>
+                <p>The below query has been entered:</p>
+                <p><span style="background-color: #f1ece8">{{ query }}</span></p>
+                <p>This query has been processed, but there are no matching notes. Please try to search something else.</p>
+                {% else %}
                 <h2>Ничего не найдено</h2>
                 <p>Введён следующий запрос:</p>
                 <p><span style="background-color: #f1ece8">{{ query }}</span></p>
                 <p>Этот запрос корректно обработан, но не нашлось ни одной заметки, соответствующей ему. Попробуйте поискать что-нибудь другое.</p>
+                {% endif %}
             </div>
         </div>
     </body>
