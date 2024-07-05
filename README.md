@@ -20,7 +20,7 @@ The repository can be used either as a whole (with notes written by me) or as a 
 
 ## Usage as existing knowledge base
 
-The most valuable part of this project is not a software. It is the [notes](https://github.com/Nikolay-Lysenko/readingbricks/tree/master/notes) itself. When writing them, I try to explain complicated things in a way that allows efficient grasping with as less ambiguity as possible. I write mostly on machine learning, but new topics are coming. Alas, there is a potential dealbreaker — as of now, the notes are in Russian only. If it does not suit you, please go to the [next section](#usage-as-an-interface).
+The most valuable part of this project is not a software. It is the [notes](https://github.com/Nikolay-Lysenko/readingbricks/tree/master/notes) themselves. When writing them, I try to explain complicated things in a way that allows efficient grasping with as little ambiguity as possible. I write mostly on machine learning, but new topics are coming. Alas, there is a potential dealbreaker — as of now, the notes are in Russian only. If it does not suit you, please go to the [next section](#usage-as-an-interface).
 
 To start with, you need to clone the repository to your local machine and install `readingbricks` package. This can be done by running the below commands from a terminal:
 ```bash
@@ -61,7 +61,7 @@ Here, fields stand for independent domains (say, machine learning, chemistry, mu
 
 All cells of a notebook must be Markdown cells starting with `## {title}`. To tag a note, activate tagging facilities with 'View -> Cell Toolbar -> Tags'. To add link from one note to an other note, special patterns `__root_url__/{field}/notes/{note_title}` and `__home_url__/notes/{note_title}` can be used. While the latter is less verbose, only the former supports cross-field links.
 
-So far so good. The knowledge base is ready, but the app must be configured to use it. Create somewhere a JSON file that looks like this:
+So far so good. The knowledge base is ready, but the app must be configured to use it. Create a JSON file somewhere that looks like this:
 ```json
 {
   "LANGUAGE": "en",
@@ -84,13 +84,13 @@ All that remains is to launch the app:
 python -m readingbricks -c /absolute/path/to/config.json
 ```
 
-As in the previous section, go to `127.0.0.1:5000`. Known bug is that some minor interface elements are in Russian regardless of notes language. I am still seeking an elegant and maintainable solution to this problem.
+As in the previous section, go to `127.0.0.1:5000`.
 
 ## Interface guide
 
 The web interface is quite self-explanatory.
 
-The only non-trivial control element is search bar which is located at home pages of fields. It can operate in three modes:
+The only non-trivial control element is search bar which is located on home pages of fields. It can operate in three modes:
 * query in natural language (e.g., `transformers in recommender systems`);
 * query as expression consisting of tags, logical operators, and parentheses — special keyword `tags:` is required (e.g. `tags: transformers AND recommender_systems`);
 * combination of above options — symbols before `tags:` form natural language query and symbols after it form tag expression (e.g., `transformers tags: recommender_systems`).
