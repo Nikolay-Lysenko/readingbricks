@@ -29,7 +29,12 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["readingbricks"]
+packages = [
+    "readingbricks",
+    "readingbricks.static.css",
+    "readingbricks.static.images",
+    "readingbricks.templates"
+]
 
 [tool.setuptools.package-data]
 "readingbricks.static.css" = ["*.css"]
