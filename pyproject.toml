@@ -32,7 +32,7 @@ dependencies = [
 packages = [
     "readingbricks",
     "readingbricks.static.css",
-    "readingbricks.static.images",
+    "readingbricks.static.images.favicons",
     "readingbricks.templates"
 ]
 
