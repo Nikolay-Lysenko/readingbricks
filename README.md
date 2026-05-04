@@ -1,6 +1,6 @@
 [![Build Status](https://github.com/Nikolay-Lysenko/readingbricks/actions/workflows/main.yml/badge.svg)](https://github.com/Nikolay-Lysenko/readingbricks/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/Nikolay-Lysenko/readingbricks/branch/master/graph/badge.svg)](https://codecov.io/gh/Nikolay-Lysenko/readingbricks)
-[![Maintainability](https://api.codeclimate.com/v1/badges/ac3959677909d81cb271/maintainability)](https://codeclimate.com/github/Nikolay-Lysenko/readingbricks/maintainability)
+[![Maintainability](https://qlty.sh/gh/Nikolay-Lysenko/projects/readingbricks/maintainability.svg)](https://qlty.sh/gh/Nikolay-Lysenko/projects/readingbricks)
 [![PyPI version](https://badge.fury.io/py/readingbricks.svg)](https://pypi.org/project/readingbricks/)
 
 # ReadingBricks
